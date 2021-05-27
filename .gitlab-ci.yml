@@ -1,0 +1,4 @@
+include:
+    - project: 'ci/repos-ci/pentagon_l1_socket_gateway'
+      ref: master
+      file: 'gitlab-ci.yml'

@@ -1,22 +1,83 @@
-import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from "@nestjs/websockets";
-import { from, Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { Server } from "socket.io";
+import { UseInterceptors } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { RavenInterceptor } from "nest-raven";
+import { Server, Socket } from "socket.io";
+import * as io from "socket.io-client";
 
 @WebSocketGateway({ transports: ['websocket'] })
-export class EventsGateway {
-  @WebSocketServer()
-  server: Server;
+export class EventsGateway implements OnGatewayDisconnect {
+    @WebSocketServer()
+    server: Server;
+    private clients = {};
 
-  @SubscribeMessage('events')
-  findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
-    return from([1, 2, 3]).pipe(
-      map((item) => ({ event: 'events', data: item })),
-    );
-  }
+    constructor(private readonly configService: ConfigService) {}
 
-  @SubscribeMessage('identity')
-  async identity(@MessageBody() data: number): Promise<number> {
-    return data;
-  }
+    handleDisconnect(client: Socket) {
+        const sockets = this.clients[client.id];
+        Object.values(sockets).forEach((socket: SocketIOClient.Socket) => {
+            socket.disconnect();
+        });
+
+        setTimeout(() => {
+            delete this.clients[client.id];
+        });
+    }
+
+    @UseInterceptors(new RavenInterceptor())
+    @SubscribeMessage('signIn')
+    signIn(client: Socket, data: any) {
+        const socket = this.connectSocket(client, data.gameName, data.session);
+        socket.on('signedIn', () => {
+            this.clients[client.id] = { [data.gameName]: socket };
+            this.server.emit(data.gameName, { signedIn: true });
+        });
+    }
+
+    @UseInterceptors(new RavenInterceptor())
+    @SubscribeMessage('inGame')
+    inGame(client: Socket, gameName: string) {
+        const socket = this.getGameSocket(client.id, gameName);
+
+        if (socket && socket.connected) {
+            socket.emit('inGame');
+        }
+    }
+
+    @UseInterceptors(new RavenInterceptor())
+    @SubscribeMessage('bet')
+    placingBet(client: Socket, data: any) {
+        const socket = this.getGameSocket(client.id, data.gameName);
+        if (socket && socket.connected) {
+            socket.emit('bet', data.betData);
+        }
+    }
+
+    private connectSocket(client: Socket, gameName: string, session: any) {
+        const socketUri = this.configService.get<string>(`services.${gameName}`);
+        const options = {
+            forceNew: true,
+            transports: ['websocket'],
+            upgrade: false,
+            extraHeaders: {
+                'user-agent': client.request.headers['user-agent'],
+            },
+        };
+        const socket = io(socketUri, options);
+
+        socket.on('connect', () => {
+            console.log('connected');
+            socket.emit('signin', session);
+        });
+
+        socket.on(gameName, (data) => {
+            this.server.emit(gameName, data);
+        });
+
+        return socket;
+    }
+
+    private getGameSocket(clientId: string, gameName: string) {
+        return this.clients[clientId]?.[gameName];
+    }
 }

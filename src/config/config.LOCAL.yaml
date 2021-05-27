@@ -1,0 +1,10 @@
+sentry:
+    dsn: 'https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33'
+
+services:
+    XocXoc: 'http://l1_sedie_service_local:5000/user/xocxoc'
+    VipSeDie: 'http://l1_vip_sedie_service_local:5000/user/vipsedie'
+    BauCua: 'http://l1_fish_prawn_crab_service_local:5000/user/baucua'
+    taixiu: 'http://l1_big_small_service_local:5000/user/taixiu'
+    TXTurbo: 'http://l1_turbo_big_small_service_local:5000/user/txturbo'
+    DragonTiger: 'http://l1_dragon_tiger_service_local:5000/user/dragontiger'

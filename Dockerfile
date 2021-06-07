@@ -12,7 +12,7 @@ FROM registry.nexdev.net:5050/docker/node:14.16-alpine
 WORKDIR /app
 
 RUN apk --no-cache add curl
-HEALTHCHECK  --interval=10s CMD curl --fail http://localhost:5000 || exit 1
+HEALTHCHECK  --interval=10s CMD curl --fail http://localhost:5000/health || exit 1
 
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV

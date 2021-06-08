@@ -1,17 +1,21 @@
 import { UseInterceptors } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { RavenInterceptor } from "nest-raven";
 import { Server, Socket } from "socket.io";
 import * as io from "socket.io-client";
 
 @WebSocketGateway({ transports: ['websocket'] })
-export class EventsGateway implements OnGatewayDisconnect {
+export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
     private clients = {};
 
     constructor(private readonly configService: ConfigService) {}
+
+    handleConnection(client: Socket, ...args: any[]) {
+        this.clients[client.id] = {};
+    }
 
     handleDisconnect(client: Socket) {
         const sockets = this.clients[client.id];
@@ -29,7 +33,8 @@ export class EventsGateway implements OnGatewayDisconnect {
     signIn(client: Socket, data: any) {
         const socket = this.connectSocket(client, data.gameName, data.session);
         socket.on('signedIn', () => {
-            this.clients[client.id] = { [data.gameName]: socket };
+            const sockets = this.clients[client.id];
+            sockets[data.gameName] = socket;
             this.server.emit(data.gameName, { signedIn: true });
         });
     }

@@ -1,3 +1,4 @@
+---
 sentry:
     dsn: 'https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33'
 

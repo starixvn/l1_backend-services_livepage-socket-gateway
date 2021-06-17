@@ -1,20 +1,48 @@
+import { CounterMetric, GaugeMetric, PromService } from "@digikare/nestjs-prom";
 import { UseInterceptors } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import {
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
+} from "@nestjs/websockets";
 import { RavenInterceptor } from "nest-raven";
 import { Server, Socket } from "socket.io";
 import * as io from "socket.io-client";
 
 @WebSocketGateway({ transports: ['websocket'] })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+    private clients = {};
+    private readonly connectTotal: CounterMetric;
+    private readonly disconnectTotal: CounterMetric;
+    private readonly connectedSockets: GaugeMetric;
+
     @WebSocketServer()
     server: Server;
-    private clients = {};
 
-    constructor(private readonly configService: ConfigService) {}
+    constructor(private readonly configService: ConfigService, private readonly promService: PromService) {
+        this.connectedSockets = promService.getGauge({
+            name: 'socket_io_connected',
+            help: 'Number of currently connected sockets',
+        });
+
+        this.connectTotal = promService.getCounter({
+            name: 'socket_io_connect_total',
+            help: 'Total count of socket.io connection requests',
+        });
+
+        this.disconnectTotal = promService.getCounter({
+            name: 'socket_io_disconnect_total',
+            help: 'Total count of socket.io disconnections',
+        });
+    }
 
     handleConnection(client: Socket, ...args: any[]) {
         this.clients[client.id] = {};
+        this.connectTotal.inc();
+        this.connectedSockets.set((this.server.engine as any).clientsCount);
     }
 
     handleDisconnect(client: Socket) {
@@ -26,6 +54,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         setTimeout(() => {
             delete this.clients[client.id];
         });
+
+        this.disconnectTotal.inc();
+        this.connectedSockets.set((this.server.engine as any).clientsCount);
     }
 
     @UseInterceptors(new RavenInterceptor())

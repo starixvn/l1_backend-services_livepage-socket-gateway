@@ -3,7 +3,7 @@ import { HealthCheck, HealthCheckService, MemoryHealthIndicator } from "@nestjs/
 
 @Controller('health')
 export class HealthController {
-    constructor(private health: HealthCheckService, private memory: MemoryHealthIndicator) {}
+    constructor(private readonly health: HealthCheckService, private readonly memory: MemoryHealthIndicator) {}
 
     @Get()
     @HealthCheck()

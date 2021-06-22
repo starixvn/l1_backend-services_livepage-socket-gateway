@@ -5,13 +5,10 @@ import { EventsGateway } from "./events.gateway";
 
 @Controller('events')
 export class EventsController {
+    constructor(private readonly eventGateWay: EventsGateway) {}
 
-    constructor(private readonly eventGateWay: EventsGateway){
-    }
-
-    
-    @Get("metrics")
+    @Get('metrics')
     getSocketMetrics(): prometheus.SocketIOMetrics {
-       return this.eventGateWay.getSocketMetrics();
+        return this.eventGateWay.getSocketMetrics();
     }
 }

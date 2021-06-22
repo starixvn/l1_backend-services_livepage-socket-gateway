@@ -21,7 +21,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @WebSocketServer()
     server: Server;
 
-    constructor(private readonly configService: ConfigService) { }
+    constructor(private readonly configService: ConfigService) {}
 
     afterInit(server: Server) {
         this.socketIOMetrics = prometheus.metrics(server, {
@@ -31,7 +31,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         });
     }
 
-    getSocketMetrics(){
+    getSocketMetrics() {
         return this.socketIOMetrics.register.metrics();
     }
 

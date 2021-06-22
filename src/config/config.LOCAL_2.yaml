@@ -9,3 +9,5 @@ services:
     taixiu: 'http://l1_big_small_service_local_2:5000/user/taixiu'
     TXTurbo: 'http://l1_turbo_big_small_service_local_2:5000/user/txturbo'
     DragonTiger: 'http://l1_dragon_tiger_service_local_2:5000/user/dragontiger'
+metrics:
+    secretKey: '6c1f0f28-70f2-46ae-b031-22624a6cd8df'

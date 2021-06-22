@@ -1,14 +1,15 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Query } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import * as prometheus from "socket.io-prometheus-metrics";
 
 import { EventsGateway } from "./events.gateway";
 
 @Controller('events')
 export class EventsController {
-    constructor(private readonly eventGateWay: EventsGateway) {}
+    constructor(private readonly eventGateWay: EventsGateway, private configService: ConfigService) {}
 
     @Get('metrics')
-    getSocketMetrics(): prometheus.SocketIOMetrics {
-        return this.eventGateWay.getSocketMetrics();
+    getSocketMetrics(@Query('secretKey') secretKey): prometheus.SocketIOMetrics {
+        return secretKey === this.configService.get<string>('metrics.secretKey') ? this.eventGateWay.getSocketMetrics() : "";
     }
 }

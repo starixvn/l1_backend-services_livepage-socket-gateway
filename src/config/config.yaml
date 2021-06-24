@@ -1,7 +1,7 @@
 ---
 sentry:
     dsn: 'https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33'
-
+    env: 'LOCAL'
 services:
     XocXoc: 'http://localhost:8080/user/xocxoc'
     VipSeDie: 'http://localhost:8081/user/vipsedie'

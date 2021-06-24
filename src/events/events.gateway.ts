@@ -13,7 +13,13 @@ import { Server, Socket } from "socket.io";
 import * as io from "socket.io-client";
 import * as prometheus from "socket.io-prometheus-metrics";
 
-@WebSocketGateway({ transports: ['websocket'] })
+@WebSocketGateway({
+    transports: ['websocket'],
+    pingInterval: 60 * 1000,
+    pingTimeout: 60 * 1000,
+    allowUpgrades: false,
+    perMessageDeflate: false,
+})
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private clients = {};
     private socketIOMetrics;

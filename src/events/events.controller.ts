@@ -6,10 +6,10 @@ import { EventsGateway } from "./events.gateway";
 
 @Controller('events')
 export class EventsController {
-    constructor(private readonly eventGateWay: EventsGateway, private configService: ConfigService) {}
+    constructor(private readonly eventGateWay: EventsGateway, private readonly configService: ConfigService) {}
 
     @Get('metrics')
     getSocketMetrics(@Query('secretKey') secretKey): prometheus.SocketIOMetrics {
-        return secretKey === this.configService.get<string>('metrics.secretKey') ? this.eventGateWay.getSocketMetrics() : "";
+        return secretKey === this.configService.get<string>('metrics.secretKey') ? this.eventGateWay.getSocketMetrics() : '';
     }
 }

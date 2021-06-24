@@ -1,6 +1,7 @@
 ---
 sentry:
-    dsn: 'https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33'
+    dsn: 'https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33',
+    env: 'LOCAL'
 
 services:
     XocXoc: 'http://l1_sedie_service_local:5000/user/xocxoc'

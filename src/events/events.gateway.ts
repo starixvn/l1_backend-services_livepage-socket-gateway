@@ -63,7 +63,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         socket.on('signedIn', () => {
             const sockets = this.clients[client.id];
             sockets[data.gameName] = socket;
-            this.server.emit(data.gameName, { signedIn: true });
+            client.emit(data.gameName, { signedIn: true });
         });
     }
 
@@ -99,12 +99,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const socket = io(socketUri, options);
 
         socket.on('connect', () => {
-            console.log('connected');
             socket.emit('signin', session);
         });
 
         socket.on(gameName, (data) => {
-            this.server.emit(gameName, data);
+            client.emit(gameName, data);
         });
 
         return socket;

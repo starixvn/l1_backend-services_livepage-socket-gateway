@@ -1,6 +1,6 @@
 ---
 sentry:
-    dsn: 'https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33',
+    dsn: 'https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33'
     env: 'LOCAL_1'
 
 services:

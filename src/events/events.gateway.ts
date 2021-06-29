@@ -8,6 +8,7 @@ import {
     WebSocketGateway,
     WebSocketServer,
 } from "@nestjs/websockets";
+import * as Sentry from "@sentry/node";
 import { RavenInterceptor } from "nest-raven";
 import { Server, Socket } from "socket.io";
 import * as io from "socket.io-client";
@@ -103,6 +104,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         });
 
         socket.on(gameName, (data) => {
+            console.log(client.id);
+            Sentry.captureMessage(`${gameName}: ${client.id} - ${data}`);
+
             client.emit(gameName, data);
         });
 

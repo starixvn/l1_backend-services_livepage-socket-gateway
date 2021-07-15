@@ -12,7 +12,7 @@ import { HealthModule } from "./health/health.module";
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-        PromModule.forRoot({ defaultLabels: { app: 'socket-gateway', version: '1.0.0' } }),
+        PromModule.forRoot({ defaultLabels: { app: "socket-gateway", version: "1.0.0" } }),
         EventsModule,
         HealthModule,
     ],

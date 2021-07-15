@@ -5,7 +5,7 @@ export class AppController {
     
     @Get()
     getHello(): string {
-        return "Hello, I'm socket gateway";
+        return "Hello, I am socket gateway";
     }
 
 }

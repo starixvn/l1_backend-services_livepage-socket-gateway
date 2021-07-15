@@ -15,7 +15,7 @@ import * as io from "socket.io-client";
 import * as prometheus from "socket.io-prometheus-metrics";
 
 @WebSocketGateway({
-    transports: ['websocket'],
+    transports: ["websocket"],
     pingInterval: 60 * 1000,
     pingTimeout: 60 * 1000,
     allowUpgrades: false,
@@ -58,10 +58,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     @UseInterceptors(new RavenInterceptor())
-    @SubscribeMessage('signIn')
+    @SubscribeMessage("signIn")
     signIn(client: Socket, data: any) {
         const socket = this.connectSocket(client, data.gameName, data.session);
-        socket.on('signedIn', () => {
+        socket.on("signedIn", () => {
             const sockets = this.clients[client.id];
             sockets[data.gameName] = socket;
             client.emit(data.gameName, { signedIn: true });
@@ -69,21 +69,21 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     @UseInterceptors(new RavenInterceptor())
-    @SubscribeMessage('inGame')
+    @SubscribeMessage("inGame")
     inGame(client: Socket, gameName: string) {
         const socket = this.getGameSocket(client.id, gameName);
 
         if (socket && socket.connected) {
-            socket.emit('inGame');
+            socket.emit("inGame");
         }
     }
 
     @UseInterceptors(new RavenInterceptor())
-    @SubscribeMessage('bet')
+    @SubscribeMessage("bet")
     placingBet(client: Socket, data: any) {
         const socket = this.getGameSocket(client.id, data.gameName);
         if (socket && socket.connected) {
-            socket.emit('bet', data.betData);
+            socket.emit("bet", data.betData);
         }
     }
 
@@ -91,16 +91,16 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const socketUri = this.configService.get<string>(`services.${gameName}`);
         const options = {
             forceNew: true,
-            transports: ['websocket'],
+            transports: ["websocket"],
             upgrade: false,
             extraHeaders: {
-                'user-agent': client.request.headers['user-agent'],
+                "user-agent": client.request.headers["user-agent"],
             },
         };
         const socket = io(socketUri, options);
 
-        socket.on('connect', () => {
-            socket.emit('signin', session);
+        socket.on("connect", () => {
+            socket.emit("signin", session);
         });
 
         socket.on(gameName, (data) => {

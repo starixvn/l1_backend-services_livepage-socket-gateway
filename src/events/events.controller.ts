@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import * as prometheus from "socket.io-prometheus-metrics";
+import * as prometheus from "socket.io-prom-metrics";
 
 import { EventsGateway } from "./events.gateway";
 

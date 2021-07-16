@@ -11,9 +11,8 @@ import {
 import * as Sentry from "@sentry/node";
 import { RavenInterceptor } from "nest-raven";
 import { Server, Socket } from "socket.io";
-import * as io from "socket.io-client";
-
-// import * as prometheus from "socket.io-prometheus-metrics";
+import { io } from "socket.io-client";
+import * as prometheus from "socket.io-prom-metrics";
 
 @WebSocketGateway({
     transports: ["websocket"],
@@ -32,24 +31,23 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     constructor(private readonly configService: ConfigService) {}
 
     afterInit(server: Server) {
-        // this.socketIOMetrics = prometheus.metrics(server, {
-        //     collectDefaultMetrics: true,
-        //     createServer: false,
-        //     checkForNewNamespaces: false,
-        // });
+        this.socketIOMetrics = prometheus.metrics(server, {
+            collectDefaultMetrics: true,
+            checkForNewNamespaces: false,
+        });
     }
 
     getSocketMetrics() {
         return this.socketIOMetrics.register.metrics();
     }
 
-    handleConnection(client: Socket, ...args: any[]) {
+    handleConnection(client: Socket) {
         this.clients[client.id] = {};
     }
 
     handleDisconnect(client: Socket) {
         const sockets = this.clients[client.id];
-        Object.values(sockets).forEach((socket: SocketIOClient.Socket) => {
+        Object.values(sockets).forEach((socket: Socket) => {
             socket.disconnect();
         });
 

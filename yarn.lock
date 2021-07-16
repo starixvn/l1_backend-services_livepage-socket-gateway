@@ -445,16 +445,6 @@
     "exec-sh" "^0.3.2"
     "minimist" "^1.2.0"
 
-"@digikare/nestjs-prom@^1.0.0":
-  "integrity" "sha512-iuIdnZlwZ5EVHfcqXRveB+7J/xlv1LAvroW2qxmH9G+NjAHNTaouheDwivyKUfZHaXP9Q3Zp1pN24l3rvZi6+A=="
-  "resolved" "http://npm.lumigame.com/@digikare%2fnestjs-prom/-/nestjs-prom-1.0.0.tgz"
-  "version" "1.0.0"
-  dependencies:
-    "@nestjs/testing" "^7.3.2"
-    "prom-client" "^12.0.0"
-    "response-time" "^2.3.2"
-    "url-value-parser" "^2.0.1"
-
 "@eslint/eslintrc@^0.4.1":
   "integrity" "sha512-5v7TDE9plVhvxQeWLXDTvFvJBdH6pEsdnl2g/dAptmuFEPedQ4Erq5rsDsX+mvAM610IhNaO2W5V1dOOnDKxkQ=="
   "resolved" "http://npm.lumigame.com/@eslint%2feslintrc/-/eslintrc-0.4.1.tgz"
@@ -713,7 +703,7 @@
   "resolved" "http://npm.lumigame.com/@josephg%2fresolvable/-/resolvable-1.0.1.tgz"
   "version" "1.0.1"
 
-"@nestjs/cli@^8.0.2":
+"@nestjs/cli@^8.0.0":
   "integrity" "sha512-q46mQvqhRkmnG6fXTzL9Wk7CtDxRaa2rE1IrDX3CgXaeOgjBZsA3oJKkIqelQHfKWvPGuU6yV6gDF5pOXNXixw=="
   "resolved" "http://npm.lumigame.com/@nestjs%2fcli/-/cli-8.0.2.tgz"
   "version" "8.0.2"
@@ -741,7 +731,7 @@
     "webpack" "5.43.0"
     "webpack-node-externals" "3.0.0"
 
-"@nestjs/common@^6.0.0 || ^7.0.0", "@nestjs/common@^7.0.0", "@nestjs/common@^7.0.0 || ^8.0.0", "@nestjs/common@^7.0.8", "@nestjs/common@^8.0.0", "@nestjs/common@^8.0.2":
+"@nestjs/common@^7.0.0", "@nestjs/common@^7.0.0 || ^8.0.0", "@nestjs/common@^7.0.8", "@nestjs/common@^8.0.0":
   "integrity" "sha512-Onr29APFiOG/Ahox1ytIdNXGXBVn6ViOWErFVNRIz3ZB4guLeFlr9Cly8U3Dssrd6rxuQG22YGD8cRhBNyQHvQ=="
   "resolved" "http://npm.lumigame.com/@nestjs%2fcommon/-/common-8.0.2.tgz"
   "version" "8.0.2"
@@ -763,7 +753,7 @@
     "lodash.set" "4.3.2"
     "uuid" "8.3.2"
 
-"@nestjs/core@^6.0.0 || ^7.0.0", "@nestjs/core@^7.0.0", "@nestjs/core@^8.0.0", "@nestjs/core@^8.0.2":
+"@nestjs/core@^7.0.0", "@nestjs/core@^8.0.0":
   "integrity" "sha512-zRXD33FR8wcbMsWuMXsAxjz74PG6JvfqlZO+FKAWZaY0kAwQuNnIfhmWYh1WIVZCy+HHbXmt/x0FbZBGG1x/1A=="
   "resolved" "http://npm.lumigame.com/@nestjs%2fcore/-/core-8.0.2.tgz"
   "version" "8.0.2"
@@ -803,18 +793,7 @@
   "resolved" "http://npm.lumigame.com/@nestjs%2fmapped-types/-/mapped-types-0.4.1.tgz"
   "version" "0.4.1"
 
-"@nestjs/platform-express@^7.0.0":
-  "integrity" "sha512-Dty2bBhsW7EInMRPS1pkXKJ3GBBusEj6fnEpb0UfkaT3E7asay9c64kCmZE+8hU430qQjY+fhBb1RNWWPnUiwQ=="
-  "resolved" "http://npm.lumigame.com/@nestjs%2fplatform-express/-/platform-express-7.6.18.tgz"
-  "version" "7.6.18"
-  dependencies:
-    "body-parser" "1.19.0"
-    "cors" "2.8.5"
-    "express" "4.17.1"
-    "multer" "1.4.2"
-    "tslib" "2.2.0"
-
-"@nestjs/platform-express@^8.0.0", "@nestjs/platform-express@^8.0.2":
+"@nestjs/platform-express@^8.0.0":
   "integrity" "sha512-lDXDbxHp6yyJ2CBJ80+IkWJA51BxEPxIwzebVSeNVocAOzZg4TLe2oROmpHvawkjC0svWHjAWCCY2qi2Ojebsw=="
   "resolved" "http://npm.lumigame.com/@nestjs%2fplatform-express/-/platform-express-8.0.2.tgz"
   "version" "8.0.2"
@@ -825,7 +804,7 @@
     "multer" "1.4.2"
     "tslib" "2.3.0"
 
-"@nestjs/platform-fastify@^8.0.2":
+"@nestjs/platform-fastify@^8.0.0":
   "integrity" "sha512-dZWYXebKEr1/xsxAiX/Twt5+YPrQX2u4+Sec2JUaMoRIEJN812m3f+RToRKuerOCe5lX8nArqe0zCdITCe/iLg=="
   "resolved" "http://npm.lumigame.com/@nestjs%2fplatform-fastify/-/platform-fastify-8.0.2.tgz"
   "version" "8.0.2"
@@ -838,7 +817,7 @@
     "path-to-regexp" "3.2.0"
     "tslib" "2.3.0"
 
-"@nestjs/platform-socket.io@^8.0.0", "@nestjs/platform-socket.io@^8.0.2":
+"@nestjs/platform-socket.io@^8.0.0":
   "integrity" "sha512-01vs4P+Df/mpyIWFUdcDfRxmnOEviniOL40m5qzgYSpHpJPWnUIW22VqKno0PRatcFp2Jh7jZ2Up5ROHHJXMug=="
   "resolved" "http://npm.lumigame.com/@nestjs%2fplatform-socket.io/-/platform-socket.io-8.0.2.tgz"
   "version" "8.0.2"
@@ -846,7 +825,7 @@
     "socket.io" "4.1.3"
     "tslib" "2.3.0"
 
-"@nestjs/schematics@^8.0.0", "@nestjs/schematics@^8.0.1":
+"@nestjs/schematics@^8.0.0":
   "integrity" "sha512-rD/eqpguJpjOVI4uK1MOpqC1vPz+XvC/xT1IYiWDFU9rdJMVhHC5maTKVs/RjkwYRmPzNRTWAoMV3yOD/jC+gw=="
   "resolved" "http://npm.lumigame.com/@nestjs%2fschematics/-/schematics-8.0.1.tgz"
   "version" "8.0.1"
@@ -865,15 +844,7 @@
     "check-disk-space" "2.1.0"
     "deprecate" "^1.1.1"
 
-"@nestjs/testing@^7.3.2":
-  "integrity" "sha512-wWImNvfRapCCtLXMsxCs1Ax2Uj/qSytCnolSEXL7LnH80exwHRmBeLtTfGxArsv9Y1NHr24NarfN6H0QxysZ3g=="
-  "resolved" "http://npm.lumigame.com/@nestjs%2ftesting/-/testing-7.6.17.tgz"
-  "version" "7.6.17"
-  dependencies:
-    "optional" "0.1.4"
-    "tslib" "2.2.0"
-
-"@nestjs/testing@^8.0.2":
+"@nestjs/testing@^8.0.0":
   "integrity" "sha512-5IYw7TVeXnjKV82cvm1LIOUxQod2u0v9LUy8g+UQpSO5LluKT/l3mpWomsLH/jfcwqlPhGiynrEt1rVdwUAXdw=="
   "resolved" "http://npm.lumigame.com/@nestjs%2ftesting/-/testing-8.0.2.tgz"
   "version" "8.0.2"
@@ -881,7 +852,7 @@
     "optional" "0.1.4"
     "tslib" "2.3.0"
 
-"@nestjs/websockets@^8.0.0", "@nestjs/websockets@^8.0.2":
+"@nestjs/websockets@^8.0.0":
   "integrity" "sha512-59RBsMXfibZ6Cg7QstYn2Vm8mf8TntpUgk6lyTbW3dTccIxEcJySW8dgw+YIMzmtLs1HLom4FUMP8UX9YSCMNw=="
   "resolved" "http://npm.lumigame.com/@nestjs%2fwebsockets/-/websockets-8.0.2.tgz"
   "version" "8.0.2"
@@ -1363,20 +1334,6 @@
   dependencies:
     "@types/mime" "^1"
     "@types/node" "*"
-
-"@types/socket.io-client@^3.0.0":
-  "integrity" "sha512-s+IPvFoEIjKA3RdJz/Z2dGR4gLgysKi8owcnrVwNjgvc01Lk68LJDDsG2GRqegFITcxmvCMYM7bhMpwEMlHmDg=="
-  "resolved" "http://npm.lumigame.com/@types%2fsocket.io-client/-/socket.io-client-3.0.0.tgz"
-  "version" "3.0.0"
-  dependencies:
-    "socket.io-client" "*"
-
-"@types/socket.io@^3.0.2":
-  "integrity" "sha512-pu0sN9m5VjCxBZVK8hW37ZcMe8rjn4HHggBN5CbaRTvFwv5jOmuIRZEuddsBPa9Th0ts0SIo3Niukq+95cMBbQ=="
-  "resolved" "http://npm.lumigame.com/@types%2fsocket.io/-/socket.io-3.0.2.tgz"
-  "version" "3.0.2"
-  dependencies:
-    "socket.io" "*"
 
 "@types/stack-utils@^2.0.0":
   "integrity" "sha512-RJJrrySY7A8havqpGObOB4W92QXKJo63/jFLLgpvOtsGUqbQZ9Sbgl35KMm1DjC6j7AvmmU2bIno+3IyEaemaw=="
@@ -2991,7 +2948,7 @@
   "resolved" "http://npm.lumigame.com/delayed-stream/-/delayed-stream-1.0.0.tgz"
   "version" "1.0.0"
 
-"depd@^1.1.2", "depd@~1.1.0", "depd@~1.1.2":
+"depd@^1.1.2", "depd@~1.1.2":
   "integrity" "sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak="
   "resolved" "http://npm.lumigame.com/depd/-/depd-1.1.2.tgz"
   "version" "1.1.2"
@@ -5955,11 +5912,6 @@
   dependencies:
     "ee-first" "1.1.1"
 
-"on-headers@~1.0.1":
-  "integrity" "sha512-pZAE+FJLoyITytdqK0U5s+FIpjN0JP3OzFi/u8Rx+EV5/W+JTWGXG8xFzevE7AjBfDqHv/8vL8qQsIhHnqRkrA=="
-  "resolved" "http://npm.lumigame.com/on-headers/-/on-headers-1.0.2.tgz"
-  "version" "1.0.2"
-
 "once@^1.3.0", "once@^1.3.1", "once@^1.4.0":
   "integrity" "sha1-WDsap3WWHUsROsF9nFC6753Xa9E="
   "resolved" "http://npm.lumigame.com/once/-/once-1.4.0.tgz"
@@ -6294,13 +6246,6 @@
   dependencies:
     "tdigest" "^0.1.1"
 
-"prom-client@^12.0.0":
-  "integrity" "sha512-JbzzHnw0VDwCvoqf8y1WDtq4wSBAbthMB1pcVI/0lzdqHGJI3KBJDXle70XK+c7Iv93Gihqo0a5LlOn+g8+DrQ=="
-  "resolved" "http://npm.lumigame.com/prom-client/-/prom-client-12.0.0.tgz"
-  "version" "12.0.0"
-  dependencies:
-    "tdigest" "^0.1.1"
-
 "prom-client@^13.1.0":
   "integrity" "sha512-jT9VccZCWrJWXdyEtQddCDszYsiuWj5T0ekrPszi/WEegj3IZy6Mm09iOOVM86A4IKMWq8hZkT2dD9MaSe+sng=="
   "resolved" "http://npm.lumigame.com/prom-client/-/prom-client-13.1.0.tgz"
@@ -6627,14 +6572,6 @@
     "is-core-module" "^2.2.0"
     "path-parse" "^1.0.6"
 
-"response-time@^2.3.2":
-  "integrity" "sha1-/6cbq5UtYvfB1Jt0NDVfvGjf/Fo="
-  "resolved" "http://npm.lumigame.com/response-time/-/response-time-2.3.2.tgz"
-  "version" "2.3.2"
-  dependencies:
-    "depd" "~1.1.0"
-    "on-headers" "~1.0.1"
-
 "restore-cursor@^3.1.0":
   "integrity" "sha512-l+sSefzHpj5qimhFSE5a8nufZYAM3sBSVMAPtYkmC+4EH2anSGaEMXSD0izRQbu9nfyQ9y5JrVmp7E8oZrUjvA=="
   "resolved" "http://npm.lumigame.com/restore-cursor/-/restore-cursor-3.1.0.tgz"
@@ -6692,7 +6629,28 @@
   dependencies:
     "queue-microtask" "^1.2.2"
 
-"rxjs@^6.0.0", "rxjs@^6.0.0 || ^7.2.0", "rxjs@^6.4.0", "rxjs@^6.5.4", "rxjs@^6.6.0", "rxjs@^6.6.6", "rxjs@^7.1.0", "rxjs@6.6.7":
+"rxjs@^6.0.0 || ^7.2.0", "rxjs@^6.4.0", "rxjs@^6.5.4", "rxjs@^7.1.0", "rxjs@^7.2.0":
+  "integrity" "sha512-aX8w9OpKrQmiPKfT1bqETtUr9JygIz6GZ+gql8v7CijClsP0laoFUdKzxFAoWuRdSlOdU2+crss+cMf+cqMTnw=="
+  "resolved" "http://npm.lumigame.com/rxjs/-/rxjs-7.2.0.tgz"
+  "version" "7.2.0"
+  dependencies:
+    "tslib" "~2.1.0"
+
+"rxjs@^6.6.0":
+  "integrity" "sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ=="
+  "resolved" "http://npm.lumigame.com/rxjs/-/rxjs-6.6.7.tgz"
+  "version" "6.6.7"
+  dependencies:
+    "tslib" "^1.9.0"
+
+"rxjs@^6.6.6":
+  "integrity" "sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ=="
+  "resolved" "http://npm.lumigame.com/rxjs/-/rxjs-6.6.7.tgz"
+  "version" "6.6.7"
+  dependencies:
+    "tslib" "^1.9.0"
+
+"rxjs@6.6.7":
   "integrity" "sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ=="
   "resolved" "http://npm.lumigame.com/rxjs/-/rxjs-6.6.7.tgz"
   "version" "6.6.7"
@@ -7000,7 +6958,7 @@
   "resolved" "http://npm.lumigame.com/socket.io-adapter/-/socket.io-adapter-2.3.1.tgz"
   "version" "2.3.1"
 
-"socket.io-client@*", "socket.io-client@^4.1.3":
+"socket.io-client@^4.1.3":
   "integrity" "sha512-hISFn6PDpgDifVUiNklLHVPTMv1LAk8poHArfIUdXa+gKgbr0MZbAlquDFqCqsF30yBqa+jg42wgos2FK50BHA=="
   "resolved" "http://npm.lumigame.com/socket.io-client/-/socket.io-client-4.1.3.tgz"
   "version" "4.1.3"
@@ -7030,7 +6988,7 @@
     "prom-client" "^11.2.1"
     "socket.io" "^4.1.3"
 
-"socket.io@*", "socket.io@^4.1.3", "socket.io@4.1.3":
+"socket.io@^4.1.3", "socket.io@4.1.3":
   "integrity" "sha512-tLkaY13RcO4nIRh1K2hT5iuotfTaIQw7cVIe0FUykN3SuQi0cm7ALxuyT5/CtDswOMWUzMGTibxYNx/gU7In+Q=="
   "resolved" "http://npm.lumigame.com/socket.io/-/socket.io-4.1.3.tgz"
   "version" "4.1.3"
@@ -7860,11 +7818,6 @@
   "integrity" "sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI="
   "resolved" "http://npm.lumigame.com/urix/-/urix-0.1.0.tgz"
   "version" "0.1.0"
-
-"url-value-parser@^2.0.1":
-  "integrity" "sha512-FjIX+Q9lYmDM9uYIGdMYfQW0uLbWVwN2NrL2ayAI7BTOvEwzH+VoDdNquwB9h4dFAx+u6mb0ONLa3sHD5DvyvA=="
-  "resolved" "http://npm.lumigame.com/url-value-parser/-/url-value-parser-2.0.3.tgz"
-  "version" "2.0.3"
 
 "use@^3.1.0":
   "integrity" "sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ=="

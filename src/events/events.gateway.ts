@@ -44,6 +44,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     handleConnection(client: Socket) {
         this.clients[client.id] = {};
+        Sentry.captureMessage(`new client connected: ${client.id}`);
     }
 
     handleDisconnect(client: Socket) {
@@ -104,9 +105,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         });
 
         socket.on(gameName, (data) => {
-            console.log(client.id);
-            Sentry.captureMessage(`${gameName}: ${client.id} - ${data}`);
-
             client.emit(gameName, data);
         });
 

@@ -7035,10 +7035,10 @@
     "component-emitter" "~1.3.0"
     "debug" "~4.3.1"
 
-"socket.io-prom-metrics@^1.0.1":
-  "integrity" "sha512-s4oBMLH+L8EUgJsAWkG2mWGruaRbpO3bCpcEB/zdYSieaWiVKmdh5JS4xv2ySJVh0Hp64t3DC+50FpEb7BvTlg=="
-  "resolved" "http://npm.lumigame.com/socket.io-prom-metrics/-/socket.io-prom-metrics-1.0.1.tgz"
-  "version" "1.0.1"
+"socket.io-prom-metrics@^1.0.2":
+  "integrity" "sha512-xpUrMab2qECBaCAnpGdlgL+BbPenfeCGZeyOhTdOpyML24q14R0EjOEovqOAuOShuOfpn6/JdVUE0LLG4SV/uw=="
+  "resolved" "http://npm.lumigame.com/socket.io-prom-metrics/-/socket.io-prom-metrics-1.0.2.tgz"
+  "version" "1.0.2"
   dependencies:
     "prom-client" "^11.2.1"
     "socket.io" "^4.1.3"

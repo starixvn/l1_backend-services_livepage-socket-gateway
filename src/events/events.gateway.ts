@@ -19,8 +19,8 @@ import * as prometheus from "socket.io-prom-metrics";
     pingInterval: 60 * 1000,
     pingTimeout: 60 * 1000,
     allowUpgrades: false,
-    perMessageDeflate: false,
 })
+
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private clients = {};
     private socketIOMetrics;

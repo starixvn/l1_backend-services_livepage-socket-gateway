@@ -11,7 +11,7 @@ import {
 import * as Sentry from "@sentry/node";
 import { RavenInterceptor } from "nest-raven";
 import { Server, Socket } from "socket.io";
-import { io } from "socket.io-client";
+import * as io from "socket.io-client";
 import * as prometheus from "socket.io-prom-metrics";
 
 @WebSocketGateway({
@@ -96,7 +96,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             extraHeaders: {
                 "user-agent": client.request.headers["user-agent"],
             },
-            allowEIO3: true,
         };
         const socket = io(socketUri, options);
 

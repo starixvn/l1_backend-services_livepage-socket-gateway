@@ -96,6 +96,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             extraHeaders: {
                 "user-agent": client.request.headers["user-agent"],
             },
+            allowEIO3: true,
         };
         const socket = io(socketUri, options);
 

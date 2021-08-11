@@ -25,17 +25,21 @@ import * as prometheus from "socket.io-prom-metrics";
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private clients = {};
     private socketIOMetrics;
+    private socketUris = {};
 
     @WebSocketServer()
     server: Server;
 
     constructor(private readonly configService: ConfigService) {}
 
-    afterInit(server: Server) {      
+    afterInit(server: Server) {
         this.socketIOMetrics = prometheus.metrics(server, {
             collectDefaultMetrics: true,
             checkForNewNamespaces: false,
         });
+
+        this.socketUris = this.configService.get<string>("services");
+        console.log(this.socketUris);
     }
 
     getSocketMetrics() {
@@ -95,7 +99,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     private connectSocket(client: Socket, gameName: string, session: any) {
-        const socketUri = this.configService.get<string>(`services.${gameName.trim()}`);
+        const socketUri = this.socketUris[gameName.trim()];
 
         if (socketUri !== undefined) {
             return null;

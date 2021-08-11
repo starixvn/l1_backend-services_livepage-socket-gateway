@@ -68,6 +68,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const socket = this.connectSocket(client, data.gameName, data.session);
 
         if (socket) {
+            Sentry.captureMessage(`signedIn with ${client.id}`);
             socket.on("signedIn", () => {
                 const sockets = this.clients[client.id];
                 sockets[data.gameName] = socket;
@@ -122,6 +123,16 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             socket.emit("signin", session);
         });
 
+        socket.on("connection", (socketClient) => {
+            socket.on("disconnect", function () {
+                Sentry.captureMessage(`disconnect ${socketClient.id}`);
+
+                if (this.clients[socketClient.id]) {
+                    this.clients[socketClient.id] = {};
+                }
+            });
+        });
+
         socket.on(gameName, (data) => {
             client.emit(gameName, data);
         });
@@ -130,12 +141,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             //TODO clean socket
             Sentry.captureException(error);
         });
-
-        socket.on("disconnect", function () {
-            this.clients[socket.id] = {};
-        });
-
-        //TODO handle disconnect
 
         return socket;
     }

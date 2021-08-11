@@ -62,11 +62,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @SubscribeMessage("signIn")
     signIn(client: Socket, data: any) {
         const socket = this.connectSocket(client, data.gameName, data.session);
-        socket.on("signedIn", () => {
-            const sockets = this.clients[client.id];
-            sockets[data.gameName] = socket;
-            client.emit(data.gameName, { signedIn: true });
-        });
+
+        if (socket) {
+            socket.on("signedIn", () => {
+                const sockets = this.clients[client.id];
+                sockets[data.gameName] = socket;
+                client.emit(data.gameName, { signedIn: true });
+            });
+        } else {
+            client.emit(data.gameName, { error: "cannot open socket" });
+            Sentry.captureMessage(`cannot open socket for : ${data.gameName}, username ${data.session.username}`);
+        }
     }
 
     @UseInterceptors(new RavenInterceptor())
@@ -90,6 +96,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     private connectSocket(client: Socket, gameName: string, session: any) {
         const socketUri = this.configService.get<string>(`services.${gameName}`);
+
+        if (socketUri !== undefined) {
+            return null;
+        }
+
         const options = {
             forceNew: true,
             transports: ["websocket"],

@@ -105,6 +105,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             return null;
         }
 
+        Sentry.captureMessage(`connecting to ${gameName} - ${socketUri}`);
+
         const options = {
             forceNew: true,
             transports: ["websocket"],
@@ -126,6 +128,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         socket.on("connect_error", (error) => {
             //TODO clean socket
             Sentry.captureException(error);
+        });
+
+        socket.on("disconnect", function () {
+            this.clients[client.id] = {};
         });
 
         //TODO handle disconnect

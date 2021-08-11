@@ -118,6 +118,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const socket = io(socketUri, options);
 
         socket.on("connect", () => {
+            Sentry.captureMessage(`connected to ${gameName}`);
             socket.emit("signin", session);
         });
 
@@ -131,7 +132,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         });
 
         socket.on("disconnect", function () {
-            this.clients[client.id] = {};
+            this.clients[socket.id] = {};
         });
 
         //TODO handle disconnect

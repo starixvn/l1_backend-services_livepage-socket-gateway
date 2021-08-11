@@ -31,7 +31,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     constructor(private readonly configService: ConfigService) {}
 
-    afterInit(server: Server) {
+    afterInit(server: Server) {      
         this.socketIOMetrics = prometheus.metrics(server, {
             collectDefaultMetrics: true,
             checkForNewNamespaces: false,
@@ -95,7 +95,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     private connectSocket(client: Socket, gameName: string, session: any) {
-        const socketUri = this.configService.get<string>(`services.${gameName}`);
+        const socketUri = this.configService.get<string>(`services.${gameName.trim()}`);
 
         if (socketUri !== undefined) {
             return null;
@@ -120,8 +120,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         });
 
         socket.on("connect_error", (error) => {
+            //TODO clean socket
             Sentry.captureException(error);
         });
+
+        //TODO handle disconnect
 
         return socket;
     }

@@ -101,7 +101,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     private connectSocket(client: Socket, gameName: string, session: any) {
         const socketUri = this.socketUris[gameName.trim()];
 
-        if (socketUri !== undefined) {
+        if (socketUri === undefined) {
             return null;
         }
 

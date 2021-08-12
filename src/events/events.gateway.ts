@@ -139,8 +139,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         });
 
         socket.on("connect_error", (error) => {
-            //TODO clean socket
             Sentry.captureException(error);
+            client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
         });
 
         return socket;

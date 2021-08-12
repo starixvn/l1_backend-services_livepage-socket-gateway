@@ -23,6 +23,7 @@ import * as prometheus from "socket.io-prom-metrics";
 })
 
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+    private FailedConnectionErrorCode = "SB0010";
     private clients = {};
     private socketIOMetrics;
     private socketUris = {};
@@ -48,11 +49,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     handleConnection(client: Socket) {
         this.clients[client.id] = {};
-        Sentry.captureMessage(`new client connected: ${client.id}`);
     }
 
     handleDisconnect(client: Socket) {
         const sockets = this.clients[client.id];
+
         Object.values(sockets).forEach((socket: Socket) => {
             socket.disconnect();
         });
@@ -75,7 +76,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
                 client.emit(data.gameName, { signedIn: true });
             });
         } else {
-            client.emit(data.gameName, { error: "cannot open socket" });
+            client.emit(data.gameName, { errorCode: this.FailedConnectionErrorCode });
             Sentry.captureMessage(`cannot open socket for : ${data.gameName}, username ${data.session.username}`);
         }
     }
@@ -94,8 +95,20 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @SubscribeMessage("bet")
     placingBet(client: Socket, data: any) {
         const socket = this.getGameSocket(client.id, data.gameName);
+
         if (socket && socket.connected) {
             socket.emit("bet", data.betData);
+        }
+    }
+
+    @UseInterceptors(new RavenInterceptor())
+    @SubscribeMessage("outgame")
+    outGame(client: Socket, data: any) {
+        const socket = this.getGameSocket(client.id, data.gameName);
+
+        if (socket && socket.connected) {
+            socket.disconnect();
+            this.clients[client.id][data.gameName] = null;
         }
     }
 
@@ -105,8 +118,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         if (socketUri === undefined) {
             return null;
         }
-
-        Sentry.captureMessage(`connecting to ${gameName} - ${socketUri}`);
 
         const options = {
             forceNew: true,
@@ -120,18 +131,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const socket = io(socketUri, options);
 
         socket.on("connect", () => {
-            Sentry.captureMessage(`connected to ${gameName}`);
             socket.emit("signin", session);
-        });
-
-        socket.on("connection", (socketClient) => {
-            socket.on("disconnect", function () {
-                Sentry.captureMessage(`disconnect ${socketClient.id}`);
-
-                if (this.clients[socketClient.id]) {
-                    this.clients[socketClient.id] = {};
-                }
-            });
         });
 
         socket.on(gameName, (data) => {

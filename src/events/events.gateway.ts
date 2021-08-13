@@ -102,13 +102,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     @UseInterceptors(new RavenInterceptor())
-    @SubscribeMessage("outgame")
-    outGame(client: Socket, data: any) {
-        const socket = this.getGameSocket(client.id, data.gameName);
+    @SubscribeMessage("outGame")
+    outGame(client: Socket, gameName: string) {
+        const socket = this.getGameSocket(client.id, gameName);
 
         if (socket && socket.connected) {
             socket.disconnect();
-            this.clients[client.id][data.gameName] = null;
+            this.clients[client.id][gameName] = null;
         }
     }
 

@@ -70,7 +70,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         if (socket) {
             socket.on("signedIn", () => {
                 if (this.clients[client.id]) {
-                    this.clients[client.id][data.gameName] = socket;
+                    this.setGameSocket(client.id, data.gameName, socket);
                     client.emit(data.gameName, { signedIn: true });
                 }
             });
@@ -107,12 +107,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
         if (socket?.connected) {
             socket.disconnect();
-            this.clients[client.id][gameName] = null;
+            this.setGameSocket(client.id, gameName, null);
         }
     }
 
-    private connectSocket(client: Socket, gameName: string, session: any) {
-        const socketUri = this.socketUris[gameName];
+    private connectSocket(client: Socket, gameName: string, session: any): SocketIOClient.Socket {
+        const socketUri = this.socketUris[gameName.trim().toLowerCase()];
 
         if (socketUri === undefined) {
             return null;
@@ -160,6 +160,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     private getGameSocket(clientId: string, gameName: string) {
-        return this.clients[clientId]?.[gameName];
+        return this.clients[clientId]?.[gameName.trim().toLowerCase()];
+    }
+
+    private setGameSocket(clientId: string, gameName: string, socket: SocketIOClient.Socket) {
+        this.clients[clientId][gameName.trim().toLowerCase()] = socket;
     }
 }

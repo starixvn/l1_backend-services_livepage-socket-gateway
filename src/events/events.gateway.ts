@@ -32,7 +32,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     constructor(private readonly configService: ConfigService) {}
 
-    @UseInterceptors(new RavenInterceptor())
     afterInit(server: Server) {
         this.socketIOMetrics = prometheus.metrics(server, {
             collectDefaultMetrics: true,
@@ -51,12 +50,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         this.clients[client.id] = {};
     }
 
-    @UseInterceptors(new RavenInterceptor())
     handleDisconnect(client: Socket) {
         const sockets = this.clients[client.id];
 
         Object.values(sockets).forEach((socket: Socket) => {
-            socket.disconnect();
+            socket && socket.disconnect();
         });
 
         setTimeout(() => {

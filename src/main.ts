@@ -4,6 +4,7 @@ import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify
 import * as Sentry from "@sentry/node";
 
 import { AppModule } from "./app.module";
+import { ExceptionsFilter } from "./filters/exceptions.filter";
 
 async function bootstrap() {
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
@@ -12,6 +13,7 @@ async function bootstrap() {
     Sentry.init({ dsn: configService.get<string>("sentry.dsn"), environment: configService.get<string>("sentry.env") });
     Sentry.captureMessage(`Logger started at ${new Date()}`);
 
+    app.useGlobalFilters(new ExceptionsFilter());
     await app.listen(5000, "0.0.0.0");
     console.log(`Application is running on: ${await app.getUrl()}`);
 }

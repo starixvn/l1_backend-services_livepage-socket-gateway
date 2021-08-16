@@ -42,7 +42,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         console.log(this.socketUris);
     }
 
-    getSocketMetrics() {
+    getSocketMetrics(): string {
         return this.socketIOMetrics.register.metrics();
     }
 

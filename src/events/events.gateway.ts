@@ -24,7 +24,7 @@ import * as prometheus from "socket.io-prom-metrics";
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private FailedConnectionErrorCode = "SB0010";
     private clients = {};
-    private socketIOMetrics;
+    private socketIOMetrics: prometheus.SocketIOMetrics;
     private socketUris = {};
 
     @WebSocketServer()
@@ -54,7 +54,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const sockets = this.clients[client.id];
 
         Object.values(sockets).forEach((socket: Socket) => {
-            socket && socket.disconnect();
+            socket?.disconnect();
         });
 
         setTimeout(() => {
@@ -85,7 +85,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     inGame(client: Socket, gameName: string) {
         const socket = this.getGameSocket(client.id, gameName);
 
-        if (socket && socket.connected) {
+        if (socket?.connected) {
             socket.emit("inGame");
         }
     }
@@ -95,7 +95,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     placingBet(client: Socket, data: any) {
         const socket = this.getGameSocket(client.id, data.gameName);
 
-        if (socket && socket.connected) {
+        if (socket?.connected) {
             socket.emit("bet", data.betData);
         }
     }
@@ -105,14 +105,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     outGame(client: Socket, gameName: string) {
         const socket = this.getGameSocket(client.id, gameName);
 
-        if (socket && socket.connected) {
+        if (socket?.connected) {
             socket.disconnect();
             this.clients[client.id][gameName] = null;
         }
     }
 
     private connectSocket(client: Socket, gameName: string, session: any) {
-        const socketUri = this.socketUris[gameName.trim()];
+        const socketUri = this.socketUris[gameName];
 
         if (socketUri === undefined) {
             return null;

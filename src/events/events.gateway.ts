@@ -127,22 +127,36 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
                 origin: client.request.headers["origin"],
             },
         };
-        const socket = io(socketUri, options);
+        const gameSocket = io(socketUri, options);
 
-        socket.on("connect", () => {
-            socket.emit("signin", session);
+        gameSocket.on("connect", () => {
+            try {
+                gameSocket.emit("signin", session);
+            } catch (ex) {
+                Sentry.captureException(ex);
+            }
         });
 
-        socket.on(gameName, (data: any) => {
-            client.emit(gameName, data);
+        gameSocket.on(gameName, (data: any) => {
+            try {
+                client.emit(gameName, data);
+            } catch (ex) {
+                Sentry.captureException(ex);
+            }
         });
 
-        socket.on("connect_error", (error: any) => {
-            Sentry.captureException(error);
-            client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+        gameSocket.on("connect_error", (error: any) => {
+            try {
+                Sentry.captureException(error);
+
+                gameSocket.close();
+                client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+            } catch (ex) {
+                Sentry.captureException(ex);
+            }
         });
 
-        return socket;
+        return gameSocket;
     }
 
     private getGameSocket(clientId: string, gameName: string) {

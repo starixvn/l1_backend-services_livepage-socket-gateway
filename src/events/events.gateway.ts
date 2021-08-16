@@ -21,7 +21,6 @@ import * as prometheus from "socket.io-prom-metrics";
     allowUpgrades: false,
     allowEIO3: true,
 })
-
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private FailedConnectionErrorCode = "SB0010";
     private clients = {};
@@ -33,6 +32,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     constructor(private readonly configService: ConfigService) {}
 
+    @UseInterceptors(new RavenInterceptor())
     afterInit(server: Server) {
         this.socketIOMetrics = prometheus.metrics(server, {
             collectDefaultMetrics: true,
@@ -51,6 +51,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         this.clients[client.id] = {};
     }
 
+    @UseInterceptors(new RavenInterceptor())
     handleDisconnect(client: Socket) {
         const sockets = this.clients[client.id];
 
@@ -125,7 +126,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             upgrade: false,
             extraHeaders: {
                 "user-agent": client.request.headers["user-agent"],
-                "origin": client.request.headers["origin"],
+                origin: client.request.headers["origin"],
             },
         };
         const socket = io(socketUri, options);

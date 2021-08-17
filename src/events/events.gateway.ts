@@ -8,11 +8,11 @@ import {
     WebSocketGateway,
     WebSocketServer,
 } from "@nestjs/websockets";
-import * as Sentry from "@sentry/node";
 import { RavenInterceptor } from "nest-raven";
 import { Server, Socket } from "socket.io";
 import * as io from "socket.io-client";
 import * as prometheus from "socket.io-prom-metrics";
+import { CustomLogger } from "src/common/logger.service";
 
 @WebSocketGateway({
     transports: ["websocket"],
@@ -30,7 +30,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @WebSocketServer()
     server: Server;
 
-    constructor(private readonly configService: ConfigService) {}
+    constructor(private readonly configService: ConfigService, private readonly logService: CustomLogger) {}
 
     afterInit(server: Server) {
         this.socketIOMetrics = prometheus.metrics(server, {
@@ -76,7 +76,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             });
         } else {
             client.emit(data.gameName, { errorCode: this.FailedConnectionErrorCode });
-            Sentry.captureMessage(`cannot open socket for : ${data.gameName}, username ${data.session.username}`);
+            this.logService.log("Cannot open socket", [data.gameName, data.session.username]);
         }
     }
 
@@ -133,7 +133,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             try {
                 gameSocket.emit("signin", session);
             } catch (ex) {
-                Sentry.captureException(ex);
+                this.logService.error(ex);
             }
         });
 
@@ -141,18 +141,18 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             try {
                 client.emit(gameName, data);
             } catch (ex) {
-                Sentry.captureException(ex);
+                this.logService.error(ex);
             }
         });
 
         gameSocket.on("connect_error", (error: any) => {
             try {
-                Sentry.captureException(error);
+                this.logService.error(error);
 
                 gameSocket.close();
                 client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
             } catch (ex) {
-                Sentry.captureException(ex);
+                this.logService.error(ex);
             }
         });
 

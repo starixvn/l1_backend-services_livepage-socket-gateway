@@ -1,11 +1,11 @@
-import { LoggerService } from "@nestjs/common";
+import { Injectable, LoggerService, Scope } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import * as Sentry from "@sentry/node";
 
+@Injectable({ scope: Scope.DEFAULT })
 export class CustomLogger implements LoggerService {
-    constructor(dsn: string, env: string) {
-        // Sentry.init({ dsn: this.configService.get<string>("sentry.dsn"), environment: this.configService.get<string>("sentry.env") });
-
-        Sentry.init({ dsn, environment: env });
+    constructor(private readonly configService: ConfigService) {
+        Sentry.init({ dsn: this.configService.get<string>("sentry.dsn"), environment: this.configService.get<string>("sentry.env") });
         Sentry.captureMessage(`Logger started at ${new Date()}`);
     }
 

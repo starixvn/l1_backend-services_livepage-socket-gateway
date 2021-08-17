@@ -10,7 +10,7 @@ async function bootstrap() {
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
     const configService = app.get<ConfigService>(ConfigService);
 
-    app.useLogger(new CustomLogger(configService.get<string>("sentry.dsn"), configService.get<string>("sentry.env")));
+    app.useLogger(new CustomLogger(configService));
     app.useGlobalFilters(new ExceptionsFilter());
 
     await app.listen(5000, "0.0.0.0");

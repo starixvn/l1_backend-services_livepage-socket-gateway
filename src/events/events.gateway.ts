@@ -12,7 +12,8 @@ import { RavenInterceptor } from "nest-raven";
 import { Server, Socket } from "socket.io";
 import * as io from "socket.io-client";
 import * as prometheus from "socket.io-prom-metrics";
-import { CustomLogger } from "src/common/logger.service";
+
+import { CustomLogger } from "./../common/logger.service";
 
 @WebSocketGateway({
     transports: ["websocket"],

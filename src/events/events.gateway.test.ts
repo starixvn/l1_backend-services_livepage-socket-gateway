@@ -1,7 +1,7 @@
 import { ConfigModule } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 
-import { LoggerModule } from "./../common/logger.module";
+import { LoggerModule } from "../common/logger.module";
 import { EventsGateway } from "./events.gateway";
 
 describe("EventsGateway", () => {

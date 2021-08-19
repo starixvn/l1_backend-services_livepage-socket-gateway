@@ -9,6 +9,6 @@ export class AppController {
 
     @Get("health")
     healthCheck(): string {
-        return "I am socket gateway";
+        return "Socket gateway is OK";
     }
 }

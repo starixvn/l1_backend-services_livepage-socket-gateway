@@ -8,10 +8,7 @@ import configuration from "./config/configuration";
 import { EventsModule } from "./events/events.module";
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-        EventsModule,
-    ],
+    imports: [ConfigModule.forRoot({ isGlobal: true, load: [configuration] }), EventsModule],
     providers: [{ provide: APP_INTERCEPTOR, useValue: new RavenInterceptor() }],
     controllers: [AppController],
 })

@@ -4,18 +4,22 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { LoggerModule } from "../common/logger.module";
 import { EventsGateway } from "./events.gateway";
 
+let gateway: EventsGateway;
+
+beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+        imports: [ConfigModule, LoggerModule],
+        providers: [EventsGateway],
+    }).compile();
+
+    gateway = module.get<EventsGateway>(EventsGateway);
+});
+
+afterEach(() => {
+    jest.clearAllMocks();
+});
+
 describe("EventsGateway", () => {
-    let gateway: EventsGateway;
-
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            imports: [ConfigModule, LoggerModule],
-            providers: [EventsGateway],
-        }).compile();
-
-        gateway = module.get<EventsGateway>(EventsGateway);
-    });
-
     it("should be defined", () => {
         expect(gateway).toBeDefined();
     });

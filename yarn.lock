@@ -878,7 +878,7 @@
   "resolved" "http://npm.lumigame.com/@nestjs%2fmapped-types/-/mapped-types-1.0.0.tgz"
   "version" "1.0.0"
 
-"@nestjs/platform-express@^8.0.0", "@nestjs/platform-express@^8.0.6":
+"@nestjs/platform-express@^8.0.0":
   "integrity" "sha512-1nIWd2w3aq3k0UNThDI6VWLqurc0Fvw3FO6BHWHK+Y7H/z9KFHZ0W/HdD9IJH05m4Smp/2neZoMkKdlXeh9wpQ=="
   "resolved" "http://npm.lumigame.com/@nestjs%2fplatform-express/-/platform-express-8.0.6.tgz"
   "version" "8.0.6"
@@ -4287,18 +4287,7 @@
     "statuses" ">= 1.5.0 < 2"
     "toidentifier" "1.0.0"
 
-"http-errors@~1.7.2":
-  "integrity" "sha512-ZTTX0MWrsQ2ZAhA1cejAwDLycFsd7I7nVtnkT3Ol0aqodaKW+0CTZDQ1uBv5whptCnc8e8HeRRJxRs0kmm/Qfw=="
-  "resolved" "http://npm.lumigame.com/http-errors/-/http-errors-1.7.3.tgz"
-  "version" "1.7.3"
-  dependencies:
-    "depd" "~1.1.2"
-    "inherits" "2.0.4"
-    "setprototypeof" "1.1.1"
-    "statuses" ">= 1.5.0 < 2"
-    "toidentifier" "1.0.0"
-
-"http-errors@1.7.2":
+"http-errors@~1.7.2", "http-errors@1.7.2":
   "integrity" "sha512-uUQBt3H/cSIVfch6i1EuPNy/YsRSOUBXTVfZ+yR7Zjez3qjBz6i9+i4zjNaoqcoFVI4lQJ5plg63TvGfRSDCRg=="
   "resolved" "http://npm.lumigame.com/http-errors/-/http-errors-1.7.2.tgz"
   "version" "1.7.2"

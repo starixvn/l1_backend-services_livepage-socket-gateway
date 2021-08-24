@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 
-import { LoggerModule } from "./../common/logger.module";
+import { CommonModule } from "../common/common.module";
 import { EventsController } from "./events.controller";
 import { EventsGateway } from "./events.gateway";
 
 @Module({
-    imports: [ConfigModule, LoggerModule],
+    imports: [ConfigModule, CommonModule],
     providers: [EventsGateway],
     controllers: [EventsController],
 })

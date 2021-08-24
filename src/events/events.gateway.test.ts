@@ -1,14 +1,14 @@
 import { ConfigModule } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 
-import { LoggerModule } from "../common/logger.module";
+import { CommonModule } from "../common/common.module";
 import { EventsGateway } from "./events.gateway";
 
 let gateway: EventsGateway;
 
 beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-        imports: [ConfigModule, LoggerModule],
+        imports: [ConfigModule, CommonModule],
         providers: [EventsGateway],
     }).compile();
 

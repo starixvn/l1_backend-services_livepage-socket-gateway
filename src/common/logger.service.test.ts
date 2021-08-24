@@ -1,6 +1,6 @@
 import { ConfigModule } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
-import { captureException, captureMessage, init } from "@sentry/node";
+import { captureException, captureMessage } from "@sentry/node";
 
 import { CustomLogger } from "./logger.service";
 

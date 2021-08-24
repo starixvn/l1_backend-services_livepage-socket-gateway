@@ -23,7 +23,7 @@ import { CustomLogger } from "./../common/logger.service";
     allowEIO3: true,
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
-    private FailedConnectionErrorCode = "SB0010";
+    private readonly FailedConnectionErrorCode = "SB0010";
     private clients = {};
     private socketIOMetrics: prometheus.SocketIOMetrics;
     private socketUris = {};

@@ -1,7 +1,7 @@
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test } from "@nestjs/testing";
 
-import { LoggerModule } from "../common/logger.module";
+import { CommonModule } from "../common/common.module";
 import { EventsController } from "./events.controller";
 import { EventsGateway } from "./events.gateway";
 
@@ -12,7 +12,7 @@ describe("EventsController", () => {
 
     beforeEach(async () => {
         const moduleRef = await Test.createTestingModule({
-            imports: [ConfigModule, LoggerModule],
+            imports: [ConfigModule, CommonModule],
             controllers: [EventsController],
             providers: [EventsGateway],
         }).compile();

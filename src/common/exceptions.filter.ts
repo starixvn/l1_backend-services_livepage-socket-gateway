@@ -1,11 +1,17 @@
 import { ArgumentsHost, Catch } from "@nestjs/common";
 import { BaseWsExceptionFilter } from "@nestjs/websockets";
-import * as Sentry from "@sentry/node";
+
+import { CustomLogger } from "./logger.service";
 
 @Catch()
 export class ExceptionsFilter extends BaseWsExceptionFilter {
+    constructor(private readonly logService: CustomLogger) {
+        super();
+    }
+
     catch(exception: unknown, host: ArgumentsHost) {
         super.catch(exception, host);
-        Sentry.captureException(exception);
+
+        this.logService.error(exception);
     }
 }

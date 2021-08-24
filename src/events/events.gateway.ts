@@ -1,6 +1,8 @@
 import { UseInterceptors } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
+    ConnectedSocket,
+    MessageBody,
     OnGatewayConnection,
     OnGatewayDisconnect,
     OnGatewayInit,
@@ -65,7 +67,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("signIn")
-    signIn(client: Socket, data: any) {
+    signIn(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
         const socket = this.connectSocket(client, data.gameName, data.session);
 
         if (socket) {
@@ -83,7 +85,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("inGame")
-    inGame(client: Socket, gameName: string) {
+    inGame(@MessageBody() gameName: string, @ConnectedSocket() client: Socket) {
         const socket = this.getGameSocket(client.id, gameName);
 
         if (socket?.connected) {
@@ -93,7 +95,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("bet")
-    placingBet(client: Socket, data: any) {
+    placingBet(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
         const socket = this.getGameSocket(client.id, data.gameName);
 
         if (socket?.connected) {
@@ -103,7 +105,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("outGame")
-    outGame(client: Socket, gameName: string) {
+    outGame(@MessageBody() gameName: string, @ConnectedSocket() client: Socket) {
         const socket = this.getGameSocket(client.id, gameName);
 
         if (socket?.connected) {

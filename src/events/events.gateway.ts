@@ -53,11 +53,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     handleDisconnect(client: any) {
+        if (!this.clients[client.id]) {
+            return;
+        }
+
         const sockets = this.clients[client.id];
 
         Object.values(sockets).forEach((socket: any) => {
-            socket.disconnect();
-            socket.close();
+            if (socket) {
+                socket.disconnect();
+                socket.close();
+            }
         });
 
         setTimeout(() => {
@@ -68,6 +74,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("signIn")
     signIn(@MessageBody() data: any, @ConnectedSocket() client: any) {
+        if (!data?.gameName) {
+            return null;
+        }
+
         const socket = this.connectSocket(client, data.gameName, data.session);
 
         if (socket) {
@@ -86,6 +96,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("inGame")
     inGame(@MessageBody() gameName: string, @ConnectedSocket() client: any) {
+        if (!gameName) {
+            return;
+        }
+
         const socket = this.getGameSocket(client.id, gameName);
 
         if (socket?.connected) {
@@ -96,6 +110,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("bet")
     placingBet(@MessageBody() data: any, @ConnectedSocket() client: any) {
+        if (!data?.gameName) {
+            return;
+        }
+
         const socket = this.getGameSocket(client.id, data.gameName);
 
         if (socket?.connected) {
@@ -106,6 +124,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("outGame")
     outGame(@MessageBody() gameName: string, @ConnectedSocket() client: any) {
+        if (!gameName) {
+            return;
+        }
+
         const socket = this.getGameSocket(client.id, gameName);
 
         if (socket?.connected) {
@@ -176,7 +198,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     private setGameSocket(clientId: string, gameName: string, socket: SocketIOClient.Socket) {
-        this.clients[clientId][gameName.trim().toLowerCase()] = socket;
+        if (this.clients[clientId]) {
+            this.clients[clientId][gameName.trim().toLowerCase()] = socket;
+        }
     }
 
     public getClients() {

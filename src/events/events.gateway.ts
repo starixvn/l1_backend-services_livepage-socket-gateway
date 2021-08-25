@@ -11,7 +11,6 @@ import {
     WebSocketServer,
 } from "@nestjs/websockets";
 import { RavenInterceptor } from "nest-raven";
-import { Server, Socket } from "socket.io";
 import * as io from "socket.io-client";
 import * as prometheus from "socket.io-prom-metrics";
 
@@ -31,11 +30,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     private socketUris = {};
 
     @WebSocketServer()
-    server: Server;
+    server: any;
 
     constructor(private readonly configService: ConfigService, private readonly logService: CustomLogger) {}
 
-    afterInit(server: Server) {
+    afterInit(server: any) {
         this.socketIOMetrics = prometheus.metrics(server, {
             collectDefaultMetrics: true,
             checkForNewNamespaces: false,
@@ -49,15 +48,16 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         return this.socketIOMetrics.register.metrics();
     }
 
-    handleConnection(client: Socket) {
+    handleConnection(client: any) {
         this.clients[client.id] = {};
     }
 
-    handleDisconnect(client: Socket) {
+    handleDisconnect(client: any) {
         const sockets = this.clients[client.id];
 
-        Object.values(sockets).forEach((socket: Socket) => {
-            socket?.disconnect();
+        Object.values(sockets).forEach((socket: any) => {
+            socket.disconnect();
+            socket.close();
         });
 
         setTimeout(() => {
@@ -67,7 +67,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("signIn")
-    signIn(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    signIn(@MessageBody() data: any, @ConnectedSocket() client: any) {
         const socket = this.connectSocket(client, data.gameName, data.session);
 
         if (socket) {
@@ -85,7 +85,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("inGame")
-    inGame(@MessageBody() gameName: string, @ConnectedSocket() client: Socket) {
+    inGame(@MessageBody() gameName: string, @ConnectedSocket() client: any) {
         const socket = this.getGameSocket(client.id, gameName);
 
         if (socket?.connected) {
@@ -95,7 +95,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("bet")
-    placingBet(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    placingBet(@MessageBody() data: any, @ConnectedSocket() client: any) {
         const socket = this.getGameSocket(client.id, data.gameName);
 
         if (socket?.connected) {
@@ -105,7 +105,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("outGame")
-    outGame(@MessageBody() gameName: string, @ConnectedSocket() client: Socket) {
+    outGame(@MessageBody() gameName: string, @ConnectedSocket() client: any) {
         const socket = this.getGameSocket(client.id, gameName);
 
         if (socket?.connected) {
@@ -114,7 +114,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         }
     }
 
-    private connectSocket(client: Socket, gameName: string, session: any): SocketIOClient.Socket {
+    private connectSocket(client: any, gameName: string, session: any): SocketIOClient.Socket {
         const socketUri = this.socketUris[gameName.trim().toLowerCase()];
 
         if (socketUri === undefined) {
@@ -168,5 +168,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     private setGameSocket(clientId: string, gameName: string, socket: SocketIOClient.Socket) {
         this.clients[clientId][gameName.trim().toLowerCase()] = socket;
+    }
+
+    public getClients() {
+        return this.clients;
     }
 }

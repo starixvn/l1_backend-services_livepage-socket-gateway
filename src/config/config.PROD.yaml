@@ -1,6 +1,6 @@
 ---
 sentry:
-    dsn: 'https://7dcd01e3d2a44ece83f2508c9b33bc4c@10.2.189.50:9009/159'
+    dsn: 'http://7dcd01e3d2a44ece83f2508c9b33bc4c@10.2.189.50:9009/159'
     env: 'prod'
 
 services:

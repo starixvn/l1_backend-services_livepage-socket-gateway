@@ -180,16 +180,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             }
         });
 
-        gameSocket.on("disconnect", () => {
-            try {
-                gameSocket.close();
-                this.setGameSocket(client.id, gameName, null);
-                client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
-            } catch (ex) {
-                this.logService.error(ex);
-            }
-        });
-
         return gameSocket;
     }
 

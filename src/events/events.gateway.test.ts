@@ -37,4 +37,17 @@ describe("EventsGateway", () => {
         expect(setTimeout).toHaveBeenCalled();
         expect(Object.keys(gateway.getClients()).length).toBe(0);
     });
+
+    it("signIn should remove client", () => {
+        // arrange
+        gateway.handleConnection({ id: "fda" });
+
+        // act
+        gateway.handleDisconnect({ id: "fda" });
+
+        // assert
+        jest.runAllTimers();
+        expect(setTimeout).toHaveBeenCalled();
+        expect(Object.keys(gateway.getClients()).length).toBe(0);
+    });
 });

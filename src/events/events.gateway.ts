@@ -40,7 +40,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             checkForNewNamespaces: false,
         });
 
-        this.socketUris = this.configService.get<string>("services");
+        const serviceConfigurations = this.configService.get<string>("services");
+        const env = this.configService.get<string>("env");
+        Object.entries(serviceConfigurations).forEach(([key, value]) => (this.socketUris[key] = this.formatServiceUri(value, key, env)));
+
         console.log(this.socketUris);
     }
 
@@ -203,5 +206,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     public getClients() {
         return this.clients;
+    }
+
+    private formatServiceUri(serviceName: string, gameName: string, env: string): string {
+        const envWithPort = env === "" ? "" : `_${env}:5000`;
+
+        return `http://${serviceName + envWithPort}/user/${gameName}`;
     }
 }

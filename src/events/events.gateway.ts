@@ -78,7 +78,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @SubscribeMessage("signIn")
     signIn(@MessageBody() data: any, @ConnectedSocket() client: any) {
         if (!data?.gameName) {
-            return null;
+            return;
         }
 
         const socket = this.connectSocket(client, data.gameName, data.session);

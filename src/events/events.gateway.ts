@@ -11,10 +11,10 @@ import {
     WebSocketServer,
 } from "@nestjs/websockets";
 import { RavenInterceptor } from "nest-raven";
-import * as io from "socket.io-client";
+import { io, ManagerOptions, Socket, SocketOptions } from "socket.io-client";
 import * as prometheus from "socket.io-prom-metrics";
-
 import { CustomLogger } from "./../common/logger.service";
+import * as MsgpackParser from "socket.io-msgpack-parser";
 
 @WebSocketGateway({
     transports: ["websocket"],
@@ -28,6 +28,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     private clients = {};
     private socketIOMetrics: prometheus.SocketIOMetrics;
     private socketUris = {};
+    private enabledMsgpackGameNames: Array<string> = [];
 
     @WebSocketServer()
     server: any;
@@ -42,6 +43,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
         const serviceConfigurations = this.configService.get<string>("services");
         const env = this.configService.get<string>("env");
+        this.enabledMsgpackGameNames = this.configService.get<string>("enabledMsgPack").split(",");
         Object.entries(serviceConfigurations).forEach(([key, value]) => (this.socketUris[key] = this.formatServiceUri(value, key, env)));
 
         console.log(this.socketUris);
@@ -139,14 +141,15 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         }
     }
 
-    private connectSocket(client: any, gameName: string, session: any): SocketIOClient.Socket {
-        const socketUri = this.socketUris[gameName.trim().toLowerCase()];
+    private setupGameSocket(client: any, gameName: string) {
+        const socketGameName = gameName.trim().toLowerCase();
+        const socketUri = this.socketUris[socketGameName];
 
         if (socketUri === undefined) {
             return null;
         }
 
-        const options = {
+        const options: Partial<ManagerOptions & SocketOptions> = {
             forceNew: true,
             transports: ["websocket"],
             upgrade: false,
@@ -155,41 +158,52 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
                 origin: client.request.headers["origin"],
             },
         };
-        const gameSocket = io(socketUri, options);
 
-        gameSocket.on("connect", () => {
-            try {
-                gameSocket.emit("signin", session);
-            } catch (ex) {
-                this.logService.error(ex);
-            }
-        });
+        if (this.enabledMsgpackGameNames.includes(socketGameName)) {
+            options.parser = MsgpackParser;
+        }
 
-        gameSocket.on(gameName, (data: any) => {
-            try {
-                client.emit(gameName, data);
-            } catch (ex) {
-                this.logService.error(ex);
-            }
-        });
+        return io(socketUri, options);
+    }
 
-        gameSocket.on("message", (data: any) => {
-            try {
-                client.emit("message", data);
-            } catch (ex) {
-                this.logService.error(ex);
-            }
-        });
+    private connectSocket(client: any, gameName: string, session: any): Socket {
+        const gameSocket = this.setupGameSocket(client, gameName);
 
-        gameSocket.on("connect_error", (error: any) => {
-            try {
-                this.logService.error(error);
-                gameSocket.close();
-                client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
-            } catch (ex) {
-                this.logService.error(ex);
-            }
-        });
+        if (gameSocket) {
+            gameSocket.on("connect", () => {
+                try {
+                    gameSocket.emit("signin", session);
+                } catch (ex) {
+                    this.logService.error(ex);
+                }
+            });
+
+            gameSocket.on(gameName, (data: any) => {
+                try {
+                    client.emit(gameName, data);
+                } catch (ex) {
+                    this.logService.error(ex);
+                }
+            });
+
+            gameSocket.on("message", (data: any) => {
+                try {
+                    client.emit("message", data);
+                } catch (ex) {
+                    this.logService.error(ex);
+                }
+            });
+
+            gameSocket.on("connect_error", (error: any) => {
+                try {
+                    this.logService.error(error);
+                    gameSocket.close();
+                    client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+                } catch (ex) {
+                    this.logService.error(ex);
+                }
+            });
+        }
 
         return gameSocket;
     }
@@ -198,7 +212,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         return this.clients[clientId]?.[gameName.trim().toLowerCase()];
     }
 
-    private setGameSocket(clientId: string, gameName: string, socket: SocketIOClient.Socket) {
+    private setGameSocket(clientId: string, gameName: string, socket: Socket) {
         if (this.clients[clientId]) {
             this.clients[clientId][gameName.trim().toLowerCase()] = socket;
         }

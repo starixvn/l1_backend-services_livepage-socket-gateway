@@ -33,6 +33,7 @@
         "rimraf": "^3.0.2",
         "rxjs": "^7.2.0",
         "socket.io-client": "^4.3.2",
+        "socket.io-msgpack-parser": "^3.0.1",
         "socket.io-prom-metrics": "^1.0.3"
     },
     "devDependencies": {
@@ -45,7 +46,6 @@
         "@types/jest": "^26.0.22",
         "@types/js-yaml": "^4.0.1",
         "@types/node": "^14.14.36",
-        "@types/socket.io-client": "^1.4.36",
         "@types/supertest": "^2.0.10",
         "@typescript-eslint/eslint-plugin": "^4.19.0",
         "@typescript-eslint/parser": "^4.19.0",

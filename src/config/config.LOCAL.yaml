@@ -4,7 +4,7 @@ sentry:
     dsn: "https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33"
     env: "LOCAL"
 services:
-    xocxoc: "l1_sedie_service"
+    sedie: "l1_sedie_service"
     vipsedie: "l1_vip_sedie_service"
     baucua: "l1_fish_prawn_crab_service"
     taixiu: "l1_big_small_service"
@@ -16,6 +16,6 @@ services:
     minisedie: "l1_mini_sedie_service"
     kenopromax: "l1_keno_pro_max_service"
     threecards: "l1_three_cards_service"
-enabledMsgPack: 'xocxoc,vipsedie,minisedie,taixiu,txturbo,baccarat,vipbaccarat,'
+enabledMsgPack: "sedie,vipsedie,minisedie,taixiu,txturbo,baccarat,vipbaccarat,"
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"

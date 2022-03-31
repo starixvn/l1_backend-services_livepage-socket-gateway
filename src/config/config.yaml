@@ -1,21 +1,21 @@
 ---
-env: ''
+env: ""
 sentry:
-    dsn: 'https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33'
-    env: 'LOCAL'
+    dsn: "https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33"
+    env: "LOCAL"
 services:
-    xocxoc: 'localhost:5002'
-    vipsedie: 'localhost:8081'
-    baucua: 'localhost:8082'
-    taixiu: 'localhost:8083'
-    txturbo: 'localhost:8084'
-    dragontiger: 'localhost:8085'
-    baccarat: 'localhost:8080'
-    vipbaccarat: 'localhost:8081'
-    specialsedie: 'localhost:8082'
-    minisedie: 'localhost:8083'
-    kenopromax: 'localhost:8084'
-    threecards: 'localhost:8085'
-enabledMsgPack: 'xocxoc,vipsedie,minisedie,taixiu,txturbo,baccarat,vipbaccarat,'
+    sedie: "localhost:5002"
+    vipsedie: "localhost:8081"
+    baucua: "localhost:8082"
+    taixiu: "localhost:8083"
+    txturbo: "localhost:8084"
+    dragontiger: "localhost:8085"
+    baccarat: "localhost:8080"
+    vipbaccarat: "localhost:8081"
+    specialsedie: "localhost:8082"
+    minisedie: "localhost:8083"
+    kenopromax: "localhost:8084"
+    threecards: "localhost:8085"
+enabledMsgPack: "sedie,vipsedie,minisedie,taixiu,txturbo,baccarat,vipbaccarat,"
 metrics:
-    secretKey: '6c1f0f28-70f2-46ae-b031-22624a6cd8df'
+    secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"

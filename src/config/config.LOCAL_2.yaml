@@ -7,7 +7,7 @@ sentry:
 services:
     sedie: "l1_sedie_service"
     vipsedie: "l1_vip_sedie_service"
-    baucua: "l1_fish_prawn_crab_service"
+    fishprawncrab: "l1_fish_prawn_crab_service"
     bigsmall: "l1_big_small_service"
     txturbo: "l1_turbo_big_small_service"
     dragontiger: "l1_dragon_tiger_service"

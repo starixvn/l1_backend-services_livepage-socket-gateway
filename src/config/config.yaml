@@ -6,7 +6,7 @@ sentry:
 services:
     sedie: "localhost:5002"
     vipsedie: "localhost:8081"
-    baucua: "localhost:8082"
+    fishprawncrab: "localhost:8082"
     bigsmall: "localhost:8083"
     txturbo: "localhost:8084"
     dragontiger: "localhost:8085"

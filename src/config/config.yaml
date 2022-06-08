@@ -16,6 +16,6 @@ services:
     minisedie: "localhost:8083"
     kenopromax: "localhost:8084"
     threecards: "localhost:8085"
-enabledMsgPack: "sedie,vipsedie,minisedie,bigsmall,txturbo,baccarat,vipbaccarat,"
+enabledMsgPack: false
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"

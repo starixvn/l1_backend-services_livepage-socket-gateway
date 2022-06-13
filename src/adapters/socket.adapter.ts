@@ -11,15 +11,14 @@ export class SocketIoAdapter extends IoAdapter {
         this.configService = configService;
     }
 
-    createIOServer(port: number, options?: any): Server {
+    createIOServer(port: number, options?: any) {
         const enabledMsgPack = this.configService.get("enabledMsgPack");
 
         const socketOptions = {
             ...options,
             parser: enabledMsgPack ? MsgpackParser : undefined,
-            port,
         };
 
-        return new Server(socketOptions);
+        return super.createIOServer(port, socketOptions);
     }
 }

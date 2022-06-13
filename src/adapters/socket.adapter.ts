@@ -1,7 +1,6 @@
 import { INestApplicationContext } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { IoAdapter } from "@nestjs/platform-socket.io";
-import { Server } from "socket.io";
 import * as MsgpackParser from "socket.io-msgpack-parser";
 
 export class SocketIoAdapter extends IoAdapter {

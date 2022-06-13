@@ -1,5 +1,7 @@
+import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
+import { SocketIoAdapter } from "./adapters/socket.adapter";
 
 import { AppModule } from "./app.module";
 import { ExceptionsFilter } from "./common/exceptions.filter";
@@ -8,7 +10,9 @@ import { CustomLogger } from "./common/logger.service";
 async function bootstrap() {
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
     const customLogger = app.get<CustomLogger>(CustomLogger);
+    const configService = app.get<ConfigService>(ConfigService);
 
+    app.useWebSocketAdapter(new SocketIoAdapter(configService, app));
     app.useLogger(customLogger);
     app.useGlobalFilters(new ExceptionsFilter(customLogger));
 

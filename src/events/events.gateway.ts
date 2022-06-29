@@ -28,7 +28,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     private clients = {};
     private socketIOMetrics: prometheus.SocketIOMetrics;
     private socketUris = {};
-    private enabledMsgpackGameNames: Array<string> = [];
+    private enabledMsgpack: boolean;
 
     @WebSocketServer()
     server: any;
@@ -43,7 +43,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
         const serviceConfigurations = this.configService.get<string>("services");
         const env = this.configService.get<string>("env");
-        this.enabledMsgpackGameNames = this.configService.get<string>("enabledMsgPack").split(",");
+        this.enabledMsgpack = this.configService.get<boolean>("enabledMsgPack");
         Object.entries(serviceConfigurations).forEach(([key, value]) => (this.socketUris[key] = this.formatServiceUri(value, key, env)));
 
         console.log(this.socketUris);
@@ -159,7 +159,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             },
         };
 
-        if (this.enabledMsgpackGameNames.includes(socketGameName)) {
+        if (this.enabledMsgpack) {
             options.parser = MsgpackParser;
         }
 

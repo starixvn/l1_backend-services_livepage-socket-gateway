@@ -231,7 +231,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     private formatServiceUri(serviceName: string, gameName: string, env: string): string {
-        const envWithPort = env === "" ? "" : `_${env}:5000`;
+        const envWithPort = env === "" ? "" : `-${env}-service:5000`;
 
         return `http://${serviceName + envWithPort}/user/${gameName}`;
     }

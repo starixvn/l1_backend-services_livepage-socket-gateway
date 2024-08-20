@@ -24,6 +24,7 @@ services:
     kenosouth: "l1-mini-keno-service"
     kenomini: "l1-mini-keno-service"
     kenomini2: "l1-mini-keno-service"
+    bac81: "l1-baccaratx-service"
 enabledMsgPack: false
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"

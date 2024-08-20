@@ -12,9 +12,9 @@ import {
 } from "@nestjs/websockets";
 import { RavenInterceptor } from "nest-raven";
 import { io, ManagerOptions, Socket, SocketOptions } from "socket.io-client";
+import * as MsgpackParser from "socket.io-msgpack-parser";
 import * as prometheus from "socket.io-prom-metrics";
 import { CustomLogger } from "./../common/logger.service";
-import * as MsgpackParser from "socket.io-msgpack-parser";
 
 @WebSocketGateway({
     transports: ["websocket"],
@@ -33,7 +33,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @WebSocketServer()
     server: any;
 
-    constructor(private readonly configService: ConfigService, private readonly logService: CustomLogger) {}
+    constructor(
+        private readonly configService: ConfigService,
+        private readonly logService: CustomLogger,
+    ) {}
 
     afterInit(server: any) {
         this.socketIOMetrics = prometheus.metrics(server, {
@@ -83,7 +86,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             return;
         }
 
-        const socket = this.connectSocket(client, data.gameName, data.session);
+        const socket = this.connectSocket(client, data.gameName, data.session, data.receivedEvents);
 
         if (socket) {
             socket.on("signedIn", () => {
@@ -141,6 +144,20 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         }
     }
 
+    @UseInterceptors(new RavenInterceptor())
+    @SubscribeMessage("getLobbyData")
+    getLobbyData(@MessageBody() data: any, @ConnectedSocket() client: any) {
+        if (!data?.gameName) {
+            return;
+        }
+
+        const socket = this.getGameSocket(client.id, data.gameName);
+
+        if (socket?.connected) {
+            socket.emit("getLobbyData");
+        }
+    }
+
     private setupGameSocket(client: any, gameName: string) {
         const socketGameName = gameName.trim().toLowerCase();
         const socketUri = this.socketUris[socketGameName];
@@ -166,7 +183,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         return io(socketUri, options);
     }
 
-    private connectSocket(client: any, gameName: string, session: any): Socket {
+    private connectSocket(client: any, gameName: string, session: any, receivedEvents?: string[]): Socket {
         const gameSocket = this.setupGameSocket(client, gameName);
 
         if (gameSocket) {
@@ -180,7 +197,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
             gameSocket.on(gameName, (data: any) => {
                 try {
-                    client.emit(gameName, data);
+                    if (receivedEvents) {
+                        Object.keys(data).some((key: string) => receivedEvents.includes(key)) && client.emit(gameName, data);
+                    } else {
+                        client.emit(gameName, data);
+                    }
                 } catch (ex) {
                     this.logService.error(ex);
                 }

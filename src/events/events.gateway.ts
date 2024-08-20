@@ -148,13 +148,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @SubscribeMessage("getLobbyData")
     getLobbyData(@MessageBody() data: any, @ConnectedSocket() client: any) {
         if (!data?.gameName) {
+            console.log("no game name");
             return;
         }
 
         const socket = this.getGameSocket(client.id, data.gameName);
 
         if (socket?.connected) {
+            console.log("getLobbyData");
             socket.emit("getLobbyData");
+        } else {
+            console.log(socket);
         }
     }
 
@@ -197,6 +201,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
             gameSocket.on(gameName, (data: any) => {
                 try {
+                    console.log(data);
                     if (receivedEvents) {
                         Object.keys(data).some((key: string) => receivedEvents.includes(key)) && client.emit(gameName, data);
                     } else {

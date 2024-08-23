@@ -45,9 +45,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         });
 
         const serviceConfigurations = this.configService.get<string>("services");
-        const env = this.configService.get<string>("env");
         this.enabledMsgpack = this.configService.get<boolean>("enabledMsgPack");
-        Object.entries(serviceConfigurations).forEach(([key, value]) => (this.socketUris[key] = this.formatServiceUri(value, key, env)));
+        Object.entries(serviceConfigurations).forEach(([key, value]) => (this.socketUris[key] = this.formatServiceUri(value, key)));
 
         console.log(this.socketUris);
     }
@@ -148,17 +147,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @SubscribeMessage("getLobbyData")
     getLobbyData(@MessageBody() data: any, @ConnectedSocket() client: any) {
         if (!data?.gameName) {
-            console.log("no game name");
             return;
         }
 
         const socket = this.getGameSocket(client.id, data.gameName);
 
         if (socket?.connected) {
-            console.log("getLobbyData");
             socket.emit("getLobbyData");
-        } else {
-            console.log(socket);
         }
     }
 
@@ -201,7 +196,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
             gameSocket.on(gameName, (data: any) => {
                 try {
-                    console.log(data);
                     if (receivedEvents) {
                         Object.keys(data).some((key: string) => receivedEvents.includes(key)) && client.emit(gameName, data);
                     } else {
@@ -256,9 +250,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         return this.clients;
     }
 
-    private formatServiceUri(serviceName: string, gameName: string, env: string): string {
-        const envWithPort = env === "" ? "" : `-${env}-service:5000`;
-
-        return `http://${serviceName + envWithPort}/user/${gameName}`;
+    private formatServiceUri(serviceUri: string, gameName: string): string {
+        return `${serviceUri}/user/${gameName}`;
     }
 }

@@ -33,10 +33,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     @WebSocketServer()
     server: any;
 
-    constructor(
-        private readonly configService: ConfigService,
-        private readonly logService: CustomLogger,
-    ) {}
+    constructor(private readonly configService: ConfigService, private readonly logService: CustomLogger) {}
 
     afterInit(server: any) {
         this.socketIOMetrics = prometheus.metrics(server, {
@@ -250,7 +247,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     private formatServiceUri(serviceUri: string, gameName: string): string {
-        return `${serviceUri}/user/${gameName}`;
+        return `${serviceUri}/user/${gameName.toLowerCase()}`;
     }
 
     private getSocketUri(gameName: string, serviceName: string) {

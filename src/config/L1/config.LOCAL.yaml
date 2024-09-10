@@ -25,6 +25,7 @@ services:
     kenomini: "http://l1-mini-keno-service-local-service:5000"
     kenomini2: "http://l1-mini-keno-service-local-service:5000"
     bac81: "http://l1-baccaratx-service-local-service:5000"
+    baccarat2: "http://l1-baccaratx-service-local-service:5000"
 enabledMsgPack: false
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"

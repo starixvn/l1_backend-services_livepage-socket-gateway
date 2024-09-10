@@ -85,7 +85,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             return;
         }
 
-        const socket = this.connectSocket(client, data.gameName, data.session, data.receivedEvents);
+        const socket = this.connectSocket(client, data.gameName, data.session, data.serviceName, data.receivedEvents);
 
         if (socket) {
             socket.on("signedIn", () => {
@@ -157,9 +157,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         }
     }
 
-    private setupGameSocket(client: any, gameName: string) {
-        const socketGameName = gameName.trim().toLowerCase();
-        const socketUri = this.socketUris[socketGameName];
+    private setupGameSocket(client: any, gameName: string, serviceName: string) {
+        const socketUri = this.getSocketUri(gameName, serviceName);
 
         if (socketUri === undefined) {
             return null;
@@ -182,8 +181,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         return io(socketUri, options);
     }
 
-    private connectSocket(client: any, gameName: string, session: any, receivedEvents?: string[]): Socket {
-        const gameSocket = this.setupGameSocket(client, gameName);
+    private connectSocket(client: any, gameName: string, session: any, serviceName: string, receivedEvents?: string[]): Socket {
+        const gameSocket = this.setupGameSocket(client, gameName, serviceName);
 
         if (gameSocket) {
             gameSocket.on("connect", () => {
@@ -252,5 +251,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     private formatServiceUri(serviceUri: string, gameName: string): string {
         return `${serviceUri}/user/${gameName}`;
+    }
+
+    private getSocketUri(gameName: string, serviceName: string) {
+        if (serviceName) {
+            const serviceNamePattern = this.configService.get<string>("serviceNamePattern");
+            return this.formatServiceUri(serviceNamePattern.replace("{0}", serviceName), gameName);
+        }
+
+        return this.socketUris[gameName.trim().toLowerCase()];
     }
 }

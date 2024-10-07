@@ -148,7 +148,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         }
 
         const socket = this.getGameSocket(client.id, data.gameName);
-
+        
         if (socket?.connected) {
             socket.emit("getLobbyData");
         }
@@ -252,8 +252,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     private getSocketUri(gameName: string, serviceName: string) {
         if (serviceName) {
-            const serviceNamePattern = this.configService.get<string>("serviceNamePattern");
-            return this.formatServiceUri(serviceNamePattern.replace("{0}", serviceName), gameName);
+            const serviceUrlPattern = this.configService.get<string>("serviceUrlPattern");
+            const serviceNameSeparator = this.configService.get<string>("serviceNameSeparator");
+            return this.formatServiceUri(serviceUrlPattern.replace("{0}", serviceName.replace(/-|_|\s/g, serviceNameSeparator)), gameName);
         }
 
         return this.socketUris[gameName.trim().toLowerCase()];

@@ -81,19 +81,23 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         if (!data?.gameName) {
             return;
         }
-
-        const socket = this.connectSocket(client, data.gameName, data.session, data.serviceName, data.receivedEvents);
-
-        if (socket) {
-            socket.on("signedIn", () => {
-                if (this.clients[client.id]) {
-                    this.setGameSocket(client.id, data.gameName, socket);
-                    client.emit(data.gameName, { signedIn: true });
-                }
-            });
+        const currentSocket = this.getGameSocket(client.id, data.gameName);
+        if (currentSocket?.connected) {
+            client.emit(data.gameName, { signedIn: true });
         } else {
-            client.emit(data.gameName, { errorCode: this.FailedConnectionErrorCode });
-            this.logService.log("Cannot open socket", [data.gameName, data.session.username]);
+            const socket = this.connectSocket(client, data.gameName, data.session, data.serviceName, data.receivedEvents);
+
+            if (socket) {
+                socket.on("signedIn", () => {
+                    if (this.clients[client.id]) {
+                        this.setGameSocket(client.id, data.gameName, socket);
+                        client.emit(data.gameName, { signedIn: true });
+                    }
+                });
+            } else {
+                client.emit(data.gameName, { errorCode: this.FailedConnectionErrorCode });
+                this.logService.log("Cannot open socket", [data.gameName, data.session.username]);
+            }
         }
     }
 
@@ -148,7 +152,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         }
 
         const socket = this.getGameSocket(client.id, data.gameName);
-        
+
         if (socket?.connected) {
             socket.emit("getLobbyData");
         }

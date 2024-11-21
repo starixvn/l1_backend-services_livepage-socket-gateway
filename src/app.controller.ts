@@ -4,11 +4,11 @@ import { Controller, Get } from "@nestjs/common";
 export class AppController {
     @Get()
     getHello(): string {
-        return "Hello, I am socket gateway";
+        return "Hello, I am Live page gateway";
     }
 
     @Get("health")
     healthCheck(): string {
-        return "Socket gateway is OK";
+        return "Live page gateway is OK";
     }
 }

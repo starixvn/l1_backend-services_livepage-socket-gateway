@@ -25,10 +25,14 @@ import { CustomLogger } from "./../common/logger.service";
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private readonly FailedConnectionErrorCode = "SB0010";
-    private clients = {};
     private socketIOMetrics: prometheus.SocketIOMetrics;
     private socketUris = {};
     private enabledMsgpack: boolean;
+    private viewSockets: { [gameName: string]: Socket } = {};
+    private clientSockets = {};
+    private gameSockets = {};
+    private readonly viewEvents = ["roundId", "gameConfigs", "remainingTime", "roundHistory", "odds", "snr", "spb", "epb", "finish", "um"];
+    private readonly playerEvents = ["endBet", "status"];
 
     @WebSocketServer()
     server: any;
@@ -47,8 +51,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const serviceConfigurations = this.configService.get<string>("services");
         this.enabledMsgpack = this.configService.get<boolean>("enabledMsgPack");
         Object.entries(serviceConfigurations).forEach(([key, value]) => (this.socketUris[key] = this.formatServiceUri(value, key)));
-
-        console.log(this.socketUris);
     }
 
     getSocketMetrics(): string {
@@ -56,15 +58,16 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     handleConnection(client: any) {
-        this.clients[client.id] = {};
+        this.clientSockets[client.id] = {};
+        this.gameSockets[client.id] = {};
     }
 
     handleDisconnect(client: any) {
-        if (!this.clients[client.id]) {
+        if (!this.clientSockets[client.id]) {
             return;
         }
 
-        const sockets = this.clients[client.id];
+        const sockets = this.clientSockets[client.id];
 
         Object.values(sockets).forEach((socket: any) => {
             if (socket) {
@@ -74,29 +77,30 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         });
 
         setTimeout(() => {
-            delete this.clients[client.id];
+            delete this.clientSockets[client.id];
+            delete this.gameSockets[client.id];
         });
     }
 
     @UseInterceptors(new RavenInterceptor())
-    @SubscribeMessage("signIn")
-    signIn(@MessageBody() data: any, @ConnectedSocket() client: any) {
-        if (!data?.gameName) {
+    @SubscribeMessage("joinGame")
+    joinGame(@MessageBody() data: any, @ConnectedSocket() client: any) {
+        if (!data?.gameName || !data?.session) {
             return;
         }
-        const currentSocket = this.getGameSocket(client.id, data.gameName);
+
+        // TODO: verify session
+
+        const currentSocket = this.getViewSocket(data.gameName);
         if (currentSocket?.connected) {
-            client.emit(data.gameName, { signedIn: true });
+            this.setClientSocket(client.id, data.gameName, client);
         } else {
-            const socket = this.connectSocket(client, data.gameName, data.session, data.serviceName, data.receivedEvents);
+            const socket = this.setupViewSocket(client, data.gameName, data.serviceName);
 
             if (socket) {
-                socket.on("signedIn", () => {
-                    if (this.clients[client.id]) {
-                        this.setGameSocket(client.id, data.gameName, socket);
-                        client.emit(data.gameName, { signedIn: true });
-                    }
-                });
+                this.setClientSocket(client.id, data.gameName, client);
+                this.handleViewSocketEvents(data.gameName, socket);
+                this.setViewSocket(data.gameName, socket);
             } else {
                 client.emit(data.gameName, { errorCode: this.FailedConnectionErrorCode });
                 this.logService.log("Cannot open socket", [data.gameName, data.session.username]);
@@ -105,16 +109,25 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     @UseInterceptors(new RavenInterceptor())
-    @SubscribeMessage("inGame")
-    inGame(@MessageBody() gameName: string, @ConnectedSocket() client: any) {
-        if (!gameName) {
+    @SubscribeMessage("signin")
+    signin(@MessageBody() data: any, @ConnectedSocket() client: any) {
+        if (!data?.gameName || !data?.session) {
             return;
         }
 
-        const socket = this.getGameSocket(client.id, gameName);
-
-        if (socket?.connected) {
-            socket.emit("inGame");
+        const gameSocket = this.getGameSocket(client.id, data.gameName);
+        if (gameSocket?.connected) {
+            gameSocket.emit("inGame", null);
+        } else {
+            const socket = this.setupGameSocket(client, data.gameName, data.serviceName);
+            if (socket) {
+                this.setGameSocket(client.id, data.gameName, socket);
+                this.handleGameSocketEvents(client, data.gameName, socket);
+                socket.emit("signin");
+            } else {
+                client.emit(data.gameName, { errorCode: this.FailedConnectionErrorCode });
+                this.logService.log("Cannot open socket", [data.gameName, data.session.username]);
+            }
         }
     }
 
@@ -143,22 +156,153 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
         if (socket?.connected) {
             socket.disconnect();
+            this.setClientSocket(client.id, gameName, null);
             this.setGameSocket(client.id, gameName, null);
         }
     }
 
-    @UseInterceptors(new RavenInterceptor())
-    @SubscribeMessage("getLobbyData")
-    getLobbyData(@MessageBody() data: any, @ConnectedSocket() client: any) {
-        if (!data?.gameName) {
-            return;
+    private getGameSocket(clientId: string, gameName: string) {
+        return this.clientSockets[clientId]?.[gameName];
+    }
+
+    private getViewSocket(gameName: string) {
+        return this.viewSockets[gameName];
+    }
+
+    private setViewSocket(gameName: string, socket: Socket) {
+        this.viewSockets[gameName] = socket;
+    }
+
+    private setClientSocket(clientId: any, gameName: string, socket: Socket) {
+        if (this.clientSockets[clientId]) {
+            this.clientSockets[clientId][gameName] = socket;
+        }
+    }
+
+    private setGameSocket(clientId: string, gameName: string, socket: Socket) {
+        if (this.gameSockets[clientId]) {
+            this.gameSockets[clientId][gameName] = socket;
+        }
+    }
+
+    private formatServiceUri(serviceUri: string, gameName: string): string {
+        return `${serviceUri}/user/${gameName.toLowerCase()}`;
+    }
+
+    private getSocketUri(gameName: string, serviceName: string): string {
+        if (serviceName) {
+            const serviceUrlPattern = this.configService.get<string>("serviceUrlPattern");
+            const serviceNameSeparator = this.configService.get<string>("serviceNameSeparator");
+            return this.formatServiceUri(serviceUrlPattern.replace("{0}", serviceName.replace(/-|_|\s/g, serviceNameSeparator)), gameName);
         }
 
-        const socket = this.getGameSocket(client.id, data.gameName);
+        return this.socketUris[gameName.trim().toLowerCase()];
+    }
 
-        if (socket?.connected) {
-            socket.emit("getLobbyData");
+    private initSocketOptions(origin: string, userAgent: string): Partial<ManagerOptions & SocketOptions> {
+        const options: Partial<ManagerOptions & SocketOptions> = {
+            forceNew: true,
+            transports: ["websocket"],
+            upgrade: false,
+            extraHeaders: {
+                "user-agent": userAgent,
+                origin: origin,
+            },
+        };
+        if (this.enabledMsgpack) {
+            options.parser = MsgpackParser;
         }
+        return options;
+    }
+
+    private handleViewSocketEvents(gameName: string, socket: Socket) {
+        socket.on(gameName, (data: any) => {
+            try {
+                Object.keys(data).forEach((key: string) => {
+                    if (this.viewEvents.includes(key)) {
+                        this.publishToAllPlayers(gameName, data);
+                        return;
+                    }
+                    if (this.clientSockets[key]) {
+                        this.publishToPlayer(key, gameName, data);
+                    }
+                });
+            } catch (ex) {
+                this.logService.error(ex);
+            }
+        });
+
+        socket.on("connect_error", (error: any) => {
+            try {
+                this.logService.error(error);
+                socket.close();
+                this.publishToAllPlayers(gameName, { errorCode: this.FailedConnectionErrorCode });
+            } catch (ex) {
+                this.logService.error(ex);
+            }
+        });
+
+        socket.on("disconnect", () => {
+            try {
+                this.publishToAllPlayers(gameName, { errorCode: this.FailedConnectionErrorCode });
+            } catch (ex) {
+                this.logService.error(ex);
+            }
+        });
+    }
+
+    private setupViewSocket(client: any, gameName: string, serviceName: string) {
+        const socketUri = this.getSocketUri(gameName, serviceName).replace("/user/", "/view/");
+
+        if (socketUri === undefined) {
+            return null;
+        }
+
+        const options = this.initSocketOptions("", client.request.headers["user-agent"]);
+        return io(socketUri, options);
+    }
+
+    private handleGameSocketEvents(client: any, gameName: string, socket: Socket) {
+        socket.on("signedIn", () => {
+            socket.emit("inGame", null);
+        });
+        socket.on(gameName, (data: any) => {
+            try {
+                if (data.gameConfigs && !data.snr) {
+                    client.emit(gameName, { gameConfigs: data.gameConfigs });
+                    return;
+                }
+                Object.keys(data).some((key) => this.playerEvents.includes(key)) && client.emit(gameName, data);
+            } catch (ex) {
+                this.logService.error(ex);
+            }
+        });
+
+        socket.on("message", (data: any) => {
+            try {
+                client.emit("message", { ...data, gameName });
+            } catch (ex) {
+                this.logService.error(ex);
+            }
+        });
+
+        socket.on("connect_error", (error: any) => {
+            try {
+                this.logService.error(error);
+                socket.close();
+                client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+            } catch (ex) {
+                this.logService.error(ex);
+            }
+        });
+
+        socket.on("disconnect", () => {
+            try {
+                client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+            } catch (ex) {
+                this.logService.error(ex);
+            }
+        });
     }
 
     private setupGameSocket(client: any, gameName: string, serviceName: string) {
@@ -168,102 +312,20 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             return null;
         }
 
-        const options: Partial<ManagerOptions & SocketOptions> = {
-            forceNew: true,
-            transports: ["websocket"],
-            upgrade: false,
-            extraHeaders: {
-                "user-agent": client.request.headers["user-agent"],
-                origin: client.request.headers["origin"],
-            },
-        };
-
-        if (this.enabledMsgpack) {
-            options.parser = MsgpackParser;
-        }
-
+        const options = this.initSocketOptions(client.request.headers["origin"], client.request.headers["user-agent"]);
         return io(socketUri, options);
     }
 
-    private connectSocket(client: any, gameName: string, session: any, serviceName: string, receivedEvents?: string[]): Socket {
-        const gameSocket = this.setupGameSocket(client, gameName, serviceName);
+    private publishToAllPlayers(gameName: string, data: any) {
+        Object.values(this.clientSockets).forEach((clientSocket) => {
+            const socket = clientSocket[gameName];
+            socket?.emit(gameName, data);
+        });
+    }
 
-        if (gameSocket) {
-            gameSocket.on("connect", () => {
-                try {
-                    gameSocket.emit("signin", session);
-                } catch (ex) {
-                    this.logService.error(ex);
-                }
-            });
-
-            gameSocket.on(gameName, (data: any) => {
-                try {
-                    if (receivedEvents) {
-                        Object.keys(data).some((key: string) => receivedEvents.includes(key)) && client.emit(gameName, data);
-                    } else {
-                        client.emit(gameName, data);
-                    }
-                } catch (ex) {
-                    this.logService.error(ex);
-                }
-            });
-
-            gameSocket.on("message", (data: any) => {
-                try {
-                    client.emit("message", { ...data, gameName });
-                } catch (ex) {
-                    this.logService.error(ex);
-                }
-            });
-
-            gameSocket.on("connect_error", (error: any) => {
-                try {
-                    this.logService.error(error);
-                    gameSocket.close();
-                    client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
-                } catch (ex) {
-                    this.logService.error(ex);
-                }
-            });
-
-            gameSocket.on("disconnect", () => {
-                try {
-                    client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
-                } catch (ex) {
-                    this.logService.error(ex);
-                }
-            });
+    private publishToPlayer(clientId: string, gameName: string, data: any) {
+        if (this.clientSockets[clientId]) {
+            this.clientSockets[clientId][gameName]?.emit(gameName, data);
         }
-
-        return gameSocket;
-    }
-
-    private getGameSocket(clientId: string, gameName: string) {
-        return this.clients[clientId]?.[gameName.trim().toLowerCase()];
-    }
-
-    private setGameSocket(clientId: string, gameName: string, socket: Socket) {
-        if (this.clients[clientId]) {
-            this.clients[clientId][gameName.trim().toLowerCase()] = socket;
-        }
-    }
-
-    public getClients() {
-        return this.clients;
-    }
-
-    private formatServiceUri(serviceUri: string, gameName: string): string {
-        return `${serviceUri}/user/${gameName.toLowerCase()}`;
-    }
-
-    private getSocketUri(gameName: string, serviceName: string) {
-        if (serviceName) {
-            const serviceUrlPattern = this.configService.get<string>("serviceUrlPattern");
-            const serviceNameSeparator = this.configService.get<string>("serviceNameSeparator");
-            return this.formatServiceUri(serviceUrlPattern.replace("{0}", serviceName.replace(/-|_|\s/g, serviceNameSeparator)), gameName);
-        }
-
-        return this.socketUris[gameName.trim().toLowerCase()];
     }
 }

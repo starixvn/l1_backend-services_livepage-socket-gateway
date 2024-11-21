@@ -15,6 +15,7 @@ import { io, ManagerOptions, Socket, SocketOptions } from "socket.io-client";
 import * as MsgpackParser from "socket.io-msgpack-parser";
 import * as prometheus from "socket.io-prom-metrics";
 import { CustomLogger } from "./../common/logger.service";
+// import { UserService } from "./../common/user.service";
 
 @WebSocketGateway({
     transports: ["websocket"],
@@ -26,11 +27,11 @@ import { CustomLogger } from "./../common/logger.service";
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     private readonly FailedConnectionErrorCode = "SB0010";
     private socketIOMetrics: prometheus.SocketIOMetrics;
-    private socketUris = {};
+    private socketUris: { [gameName: string]: string } = {};
     private enabledMsgpack: boolean;
     private viewSockets: { [gameName: string]: Socket } = {};
-    private clientSockets = {};
-    private gameSockets = {};
+    private clientSockets: { [clientId: string]: { [gameName: string]: Socket } } = {};
+    private gameSockets: { [clientId: string]: { [gameName: string]: Socket } } = {};
     private readonly viewEvents = ["roundId", "gameConfigs", "remainingTime", "roundHistory", "odds", "snr", "spb", "epb", "finish", "um"];
     private readonly playerEvents = ["endBet", "status"];
 
@@ -40,6 +41,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     constructor(
         private readonly configService: ConfigService,
         private readonly logService: CustomLogger,
+        // private readonly userService: UserService,
     ) {}
 
     afterInit(server: any) {
@@ -68,17 +70,30 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         }
 
         const sockets = this.clientSockets[client.id];
-
         Object.values(sockets).forEach((socket: any) => {
-            if (socket) {
-                socket.disconnect();
-                socket.close();
-            }
+            socket?.disconnect();
+        });
+
+        const gameSockets = this.gameSockets[client.id];
+        Object.values(gameSockets).forEach((socket: any) => {
+            socket?.disconnect();
+        });
+
+        const gameNames = Object.keys(gameSockets);
+        const unusedGames = gameNames.filter(
+            (gameName) =>
+                !Object.keys(this.gameSockets).some(
+                    (clientId: string) => clientId != client.id && this.gameSockets[clientId][gameName]?.connected,
+                ),
+        );
+        Object.values(unusedGames).forEach((gameName) => {
+            this.viewSockets[gameName]?.disconnect();
         });
 
         setTimeout(() => {
             delete this.clientSockets[client.id];
             delete this.gameSockets[client.id];
+            Object.values(unusedGames).forEach((gameName) => delete this.viewSockets[gameName]);
         });
     }
 
@@ -94,12 +109,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const currentSocket = this.getViewSocket(data.gameName);
         if (currentSocket?.connected) {
             this.setClientSocket(client.id, data.gameName, client);
+            currentSocket.emit("inGame", { id: client.id });
         } else {
             const socket = this.setupViewSocket(client, data.gameName, data.serviceName);
 
             if (socket) {
                 this.setClientSocket(client.id, data.gameName, client);
-                this.handleViewSocketEvents(data.gameName, socket);
+                this.handleViewSocketEvents(client.id, data.gameName, socket);
                 this.setViewSocket(data.gameName, socket);
             } else {
                 client.emit(data.gameName, { errorCode: this.FailedConnectionErrorCode });
@@ -122,8 +138,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             const socket = this.setupGameSocket(client, data.gameName, data.serviceName);
             if (socket) {
                 this.setGameSocket(client.id, data.gameName, socket);
-                this.handleGameSocketEvents(client, data.gameName, socket);
-                socket.emit("signin");
+                this.handleGameSocketEvents(client, socket, data.gameName, data.session);
             } else {
                 client.emit(data.gameName, { errorCode: this.FailedConnectionErrorCode });
                 this.logService.log("Cannot open socket", [data.gameName, data.session.username]);
@@ -162,7 +177,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     private getGameSocket(clientId: string, gameName: string) {
-        return this.clientSockets[clientId]?.[gameName];
+        return this.gameSockets[clientId]?.[gameName];
     }
 
     private getViewSocket(gameName: string) {
@@ -199,14 +214,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         return this.socketUris[gameName.trim().toLowerCase()];
     }
 
-    private initSocketOptions(origin: string, userAgent: string): Partial<ManagerOptions & SocketOptions> {
+    private initSocketOptions(userAgent: string): Partial<ManagerOptions & SocketOptions> {
         const options: Partial<ManagerOptions & SocketOptions> = {
             forceNew: true,
             transports: ["websocket"],
             upgrade: false,
             extraHeaders: {
                 "user-agent": userAgent,
-                origin: origin,
+                origin: "",
             },
         };
         if (this.enabledMsgpack) {
@@ -215,28 +230,25 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         return options;
     }
 
-    private handleViewSocketEvents(gameName: string, socket: Socket) {
+    private handleViewSocketEvents(clientId: string, gameName: string, socket: Socket) {
+        socket.on("connect", () => {
+            socket.emit("inGame", { id: clientId });
+        });
+
         socket.on(gameName, (data: any) => {
             try {
-                Object.keys(data).forEach((key: string) => {
-                    if (this.viewEvents.includes(key)) {
-                        this.publishToAllPlayers(gameName, data);
-                        return;
-                    }
-                    if (this.clientSockets[key]) {
-                        this.publishToPlayer(key, gameName, data);
-                    }
-                });
+                Object.keys(data).some((key: string) => this.viewEvents.includes(key)) && this.publishToAllPlayers(gameName, data);
+                const clientId = Object.keys(data).find((key: string) => this.clientSockets[key]?.[gameName]?.connected);
+                clientId && this.publishToPlayer(clientId, gameName, data[clientId]);
             } catch (ex) {
                 this.logService.error(ex);
             }
         });
-
         socket.on("connect_error", (error: any) => {
             try {
-                this.logService.error(error);
-                socket.close();
+                this.logService.error(error.message);
                 this.publishToAllPlayers(gameName, { errorCode: this.FailedConnectionErrorCode });
+                socket.close();
             } catch (ex) {
                 this.logService.error(ex);
             }
@@ -253,19 +265,23 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     private setupViewSocket(client: any, gameName: string, serviceName: string) {
         const socketUri = this.getSocketUri(gameName, serviceName).replace("/user/", "/view/");
-
         if (socketUri === undefined) {
             return null;
         }
 
-        const options = this.initSocketOptions("", client.request.headers["user-agent"]);
+        const options = this.initSocketOptions(client.request.headers["user-agent"]);
         return io(socketUri, options);
     }
 
-    private handleGameSocketEvents(client: any, gameName: string, socket: Socket) {
+    private handleGameSocketEvents(client: any, socket: Socket, gameName: string, session: any) {
+        socket.on("connect", () => {
+            socket.emit("signin", session);
+        });
+
         socket.on("signedIn", () => {
             socket.emit("inGame", null);
         });
+
         socket.on(gameName, (data: any) => {
             try {
                 if (data.gameConfigs && !data.snr) {
@@ -288,9 +304,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
         socket.on("connect_error", (error: any) => {
             try {
-                this.logService.error(error);
-                socket.close();
+                this.logService.error(error.message);
                 client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+                socket.close();
             } catch (ex) {
                 this.logService.error(ex);
             }
@@ -312,7 +328,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
             return null;
         }
 
-        const options = this.initSocketOptions(client.request.headers["origin"], client.request.headers["user-agent"]);
+        const options = this.initSocketOptions(client.request.headers["user-agent"]);
         return io(socketUri, options);
     }
 

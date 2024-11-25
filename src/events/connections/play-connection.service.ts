@@ -89,7 +89,7 @@ export class PlayConnectionService extends GameConnectionService {
         try {
             const { gameName } = data;
             const clientSocket = this.clientConnectionService.getSocket(clientId, gameName);
-            clientSocket?.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+            clientSocket?.emit(gameName, { errorCode: this.FailedConnectionErrorCode, reason: error.message });
             super.onConnectError(clientId, data, socket, error);
         } catch (ex) {
             this.logService.error(ex);
@@ -100,7 +100,8 @@ export class PlayConnectionService extends GameConnectionService {
         try {
             const { gameName } = data;
             const clientSocket = this.clientConnectionService.getSocket(clientId, gameName);
-            clientSocket?.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+            clientSocket?.emit(gameName, { errorCode: this.FailedConnectionErrorCode, reason: data.reason });
+            super.onDisconnect(clientId, data);
         } catch (ex) {
             this.logService.error(ex);
         }

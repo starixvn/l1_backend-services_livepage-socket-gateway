@@ -78,7 +78,10 @@ export class ViewConnectionService extends GameConnectionService {
 
     protected override onConnectError(clientId: string, data: any, socket: Socket, error: any): void {
         try {
-            this.clientConnectionService.publishToAllPlayers(data.gameName, { errorCode: this.FailedConnectionErrorCode });
+            this.clientConnectionService.publishToAllPlayers(data.gameName, {
+                errorCode: this.FailedConnectionErrorCode,
+                reason: error.message,
+            });
             super.onConnectError(clientId, data, socket, error);
         } catch (ex) {
             this.logService.error(ex);
@@ -87,7 +90,11 @@ export class ViewConnectionService extends GameConnectionService {
 
     protected override onDisconnect(clientId: string, data: any): void {
         try {
-            this.clientConnectionService.publishToAllPlayers(data.gameName, { errorCode: this.FailedConnectionErrorCode });
+            this.clientConnectionService.publishToAllPlayers(data.gameName, {
+                errorCode: this.FailedConnectionErrorCode,
+                reason: data.reason,
+            });
+            super.onDisconnect(clientId, data);
         } catch (ex) {
             this.logService.error(ex);
         }

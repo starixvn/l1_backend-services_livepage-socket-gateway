@@ -81,7 +81,7 @@ export abstract class GameConnectionService {
         return `${serviceUri}/user/${gameName.toLowerCase()}`;
     }
 
-    protected handleSocketEvents(clientId: string, data: string, socket: Socket) {
+    protected handleSocketEvents(clientId: string, data: any, socket: Socket) {
         socket.on("connect", () => {
             this.onConnected(clientId, data, socket);
         });
@@ -90,8 +90,8 @@ export abstract class GameConnectionService {
             this.onConnectError(clientId, data, socket, error);
         });
 
-        socket.on("disconnect", () => {
-            this.onDisconnect(clientId, data);
+        socket.on("disconnect", (reason) => {
+            this.onDisconnect(clientId, { reason, ...data });
         });
     }
 

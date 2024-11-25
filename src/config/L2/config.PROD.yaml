@@ -30,3 +30,4 @@ metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"
 serviceUrlPattern: "http://l2_{0}_service_prod:5000"
 serviceNameSeparator: "_"
+userServiceUrl: "http://l2_livepage_user_service_prod:5000"

@@ -8,14 +8,16 @@ import { Actions, DataKeys, SocketEvents } from "./contants";
 
 @Injectable()
 export class PlayConnectionService extends GameConnectionService {
-    private readonly receivedEvents = [DataKeys.endBet, DataKeys.status];
-
     constructor(
         protected readonly configService: ConfigService,
         protected readonly logService: CustomLogger,
         protected readonly clientConnectionService: ClientConnectionService,
     ) {
         super(configService, logService, clientConnectionService);
+    }
+
+    get receivedEvents(): string[] {
+        return [DataKeys.endBet, DataKeys.status];
     }
 
     init(clientId: string) {
@@ -49,23 +51,19 @@ export class PlayConnectionService extends GameConnectionService {
             socket.emit(Actions.inGame, null);
         });
 
-        socket.on(gameName, (gameData: any) => {
-            this.onHandleGameData(clientId, gameName, gameData);
-        });
-
         socket.on(SocketEvents.message, (gameData: any) => {
             this.onHandleMessage(clientId, gameName, gameData);
         });
     }
 
-    private onHandleGameData(clientId: string, gameName: string, gameData: any) {
+    protected override onHandleGameData(clientId: string, gameName: string, receivedEvents: string[], gameData: any) {
         try {
             const clientSocket = this.clientConnectionService.getSocket(clientId, gameName);
             if (gameData.gameConfigs && !gameData.snr) {
                 clientSocket?.emit(gameName, { gameConfigs: gameData.gameConfigs });
                 return;
             }
-            Object.keys(gameData).some((key) => this.receivedEvents.includes(key)) && clientSocket.emit(gameName, gameData);
+            Object.keys(gameData).some((key) => receivedEvents.includes(key)) && clientSocket.emit(gameName, gameData);
         } catch (ex) {
             this.logService.error(ex);
         }

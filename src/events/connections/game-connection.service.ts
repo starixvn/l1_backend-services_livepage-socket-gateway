@@ -20,6 +20,10 @@ export abstract class GameConnectionService {
         Object.entries(serviceConfigurations).forEach(([key, value]) => (this.socketUris[key] = this.formatServiceUri(value, key)));
     }
 
+    get receivedEvents(): string[] {
+        return [];
+    }
+
     getSocket(clientId: string, gameName: string): Socket {
         return this.sockets[clientId]?.[gameName];
     }
@@ -86,6 +90,12 @@ export abstract class GameConnectionService {
             this.onConnected(clientId, data, socket);
         });
 
+        const { gameName } = data;
+        const receivedEvents = data.receivedEvents || this.receivedEvents;
+        socket.on(gameName, (gameData: any) => {
+            this.onHandleGameData(clientId, gameName, receivedEvents, gameData);
+        });
+
         socket.on("connect_error", (error: any) => {
             this.onConnectError(clientId, data, socket, error);
         });
@@ -97,6 +107,9 @@ export abstract class GameConnectionService {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected onConnected(clientId: string, data: any, socket: Socket) {}
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    protected onHandleGameData(clientId: string, gameName: string, receivedEvents: string[], gameData: any) {}
 
     protected onConnectError(clientId: string, data: any, socket: Socket, error: any) {
         this.logService.error(error.message);

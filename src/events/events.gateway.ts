@@ -13,7 +13,7 @@ import { RavenInterceptor } from "nest-raven";
 import * as prometheus from "socket.io-prom-metrics";
 import { CustomLogger } from "./../common/logger.service";
 import { ClientConnectionService, PlayConnectionService, ViewConnectionService } from "./connections";
-// import { UserService } from "./../common/user.service";
+import { UserService } from "./../common/user.service";
 
 @WebSocketGateway({
     transports: ["websocket"],
@@ -34,7 +34,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         private readonly viewConnectionService: ViewConnectionService,
         private readonly playConnectionService: PlayConnectionService,
         private readonly clientConnectionService: ClientConnectionService,
-        // private readonly userService: UserService,
+        private readonly userService: UserService,
     ) {}
 
     afterInit(server: any) {
@@ -60,11 +60,18 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("joinGame")
-    joinGame(@MessageBody() data: any, @ConnectedSocket() client: any) {
+    async joinGame(@MessageBody() data: any, @ConnectedSocket() client: any) {
         if (!data?.gameName || !data?.session) {
             return;
         }
-        // TODO: verify session
+
+        const { ss, username } = data.session;
+        const browserUserAgent = client.request?.headers?.["user-agent"];
+        const validSession = await this.userService.verifyUserSession(ss, username, browserUserAgent);
+        if (!validSession) {
+            client.emit("message", { gameName: data.gameName, unauthorized: true });
+            return;
+        }
 
         const clientId = client.id;
         const { gameName } = data;

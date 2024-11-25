@@ -8,25 +8,27 @@ import { Actions, DataKeys } from "./contants";
 
 @Injectable()
 export class ViewConnectionService extends GameConnectionService {
-    private readonly receivedEvents = [
-        DataKeys.roundId,
-        DataKeys.gameConfigs,
-        DataKeys.remainingTime,
-        DataKeys.roundHistory,
-        DataKeys.odds,
-        DataKeys.startNewRound,
-        DataKeys.startPlaceBet,
-        DataKeys.endPlaceBet,
-        DataKeys.finish,
-        DataKeys.um,
-    ];
-
     constructor(
         protected readonly configService: ConfigService,
         protected readonly logService: CustomLogger,
         protected readonly clientConnectionService: ClientConnectionService,
     ) {
         super(configService, logService, clientConnectionService);
+    }
+
+    get receivedEvents(): string[] {
+        return [
+            DataKeys.roundId,
+            DataKeys.gameConfigs,
+            DataKeys.remainingTime,
+            DataKeys.roundHistory,
+            DataKeys.odds,
+            DataKeys.startNewRound,
+            DataKeys.startPlaceBet,
+            DataKeys.endPlaceBet,
+            DataKeys.finish,
+            DataKeys.um,
+        ];
     }
 
     getSocket(clientId: string, gameName: string) {
@@ -52,18 +54,9 @@ export class ViewConnectionService extends GameConnectionService {
         return `${serviceUri}/view/${gameName.toLowerCase()}`;
     }
 
-    protected override handleSocketEvents(clientId: string, data: any, socket: Socket) {
-        super.handleSocketEvents(clientId, data, socket);
-
-        const { gameName } = data;
-        socket.on(gameName, (data: any) => {
-            this.onHandleGameData(gameName, data);
-        });
-    }
-
-    private onHandleGameData(gameName: string, gameData: any) {
+    protected override onHandleGameData(clientId: string, gameName: string, receivedEvents: string[], gameData: any) {
         try {
-            Object.keys(gameData).some((key: string) => this.receivedEvents.includes(key)) &&
+            Object.keys(gameData).some((key: string) => receivedEvents.includes(key)) &&
                 this.clientConnectionService.publishToAllPlayers(gameName, gameData);
             const clientId = Object.keys(gameData).find((key: string) => this.clientConnectionService.getSocket(key, gameName)?.connected);
             clientId && this.clientConnectionService.publishToPlayer(clientId, gameName, gameData[clientId]);
@@ -73,7 +66,7 @@ export class ViewConnectionService extends GameConnectionService {
     }
 
     protected override onConnected(clientId: string, data: any, socket: Socket): void {
-        socket.emit("inGame", { id: clientId });
+        socket.emit(Actions.inGame, { id: clientId });
     }
 
     protected override onConnectError(clientId: string, data: any, socket: Socket, error: any): void {

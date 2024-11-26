@@ -3,6 +3,7 @@ import { CustomLogger } from "../../common/logger.service";
 import { ClientConnectionService } from "./client-connection.service";
 import * as MsgpackParser from "socket.io-msgpack-parser";
 import { io, ManagerOptions, Socket, SocketOptions } from "socket.io-client";
+import { SocketEvents } from "./contants";
 
 export abstract class GameConnectionService {
     protected sockets = {};
@@ -26,6 +27,14 @@ export abstract class GameConnectionService {
 
     getSocket(clientId: string, gameName: string): Socket {
         return this.sockets[clientId]?.[gameName];
+    }
+
+    getOrCreateSocket(clientSocket: any, data: any): Socket {
+        if (!this.sockets[clientSocket.id]?.[data.gameName]?.connected) {
+            this.sockets[clientSocket.id][data.gameName] = this.setupSocket(clientSocket, data);
+        }
+
+        return this.sockets[clientSocket.id]?.[data.gameName];
     }
 
     setSocket(clientId: string, gameName: string, socket: Socket) {
@@ -86,7 +95,7 @@ export abstract class GameConnectionService {
     }
 
     protected handleSocketEvents(clientId: string, data: any, socket: Socket) {
-        socket.on("connect", () => {
+        socket.on(SocketEvents.connect, () => {
             this.onConnected(clientId, data, socket);
         });
 
@@ -96,11 +105,11 @@ export abstract class GameConnectionService {
             this.onHandleGameData(clientId, gameName, receivedEvents, gameData);
         });
 
-        socket.on("connect_error", (error: any) => {
+        socket.on(SocketEvents.connectError, (error: any) => {
             this.onConnectError(clientId, data, socket, error);
         });
 
-        socket.on("disconnect", (reason) => {
+        socket.on(SocketEvents.disconnect, (reason) => {
             this.onDisconnect(clientId, { reason, ...data });
         });
     }

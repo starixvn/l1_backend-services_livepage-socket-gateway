@@ -76,20 +76,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const clientId = client.id;
         const { gameName } = data;
 
-        const viewSocket = this.viewConnectionService.getSocket(clientId, gameName);
-        if (viewSocket?.connected) {
+        const viewSocket = this.viewConnectionService.getOrCreateSocket(client, data);
+        if (viewSocket) {
             this.clientConnectionService.setSocket(clientId, gameName, client);
-            this.viewConnectionService.inGame(clientId, gameName);
+            viewSocket.connected && this.viewConnectionService.inGame(clientId, gameName);
         } else {
-            const socket = this.viewConnectionService.setupSocket(client, data);
-
-            if (socket) {
-                this.clientConnectionService.setSocket(clientId, gameName, client);
-                this.viewConnectionService.setSocket(clientId, gameName, socket);
-            } else {
-                client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
-                this.logService.log("Cannot open socket", [gameName, data.session.username]);
-            }
+            client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+            this.logService.log("Cannot open socket", [gameName, data.session.username]);
         }
     }
 
@@ -103,28 +96,20 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
         const clientId = client.id;
         const { gameName } = data;
 
-        const gameSocket = this.playConnectionService.getSocket(clientId, gameName);
-        if (gameSocket?.connected) {
-            this.clientConnectionService.setSocket(client.id, gameName, client);
-            this.playConnectionService.inGame(clientId, gameName);
-            gameSocket.emit("inGame", null);
+        const playSocket = this.playConnectionService.getOrCreateSocket(client, data);
+        if (playSocket) {
+            this.clientConnectionService.setSocket(clientId, gameName, client);
+            playSocket.connected && this.playConnectionService.inGame(clientId, gameName);
         } else {
-            const socket = this.playConnectionService.setupSocket(client, data);
-
-            if (socket) {
-                this.clientConnectionService.setSocket(client.id, gameName, client);
-                this.playConnectionService.setSocket(clientId, gameName, socket);
-            } else {
-                client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
-                this.logService.log("Cannot open socket", [gameName, data.session.username]);
-            }
+            client.emit(gameName, { errorCode: this.FailedConnectionErrorCode });
+            this.logService.log("Cannot open socket", [gameName, data.session.username]);
         }
     }
 
     @UseInterceptors(new RavenInterceptor())
     @SubscribeMessage("bet")
     placingBet(@MessageBody() data: any, @ConnectedSocket() client: any) {
-        if (!data?.gameName) {
+        if (!data?.gameName || !data?.betData) {
             return;
         }
 

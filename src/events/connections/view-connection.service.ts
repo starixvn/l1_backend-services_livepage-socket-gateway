@@ -31,7 +31,15 @@ export class ViewConnectionService extends GameConnectionService {
         ];
     }
 
-    getSocket(clientId: string, gameName: string) {
+    getSocket(clientId: string, gameName: string): Socket {
+        return this.sockets[gameName];
+    }
+
+    getOrCreateSocket(clientSocket: any, data: any): Socket {
+        const { gameName } = data;
+        if (!this.sockets[gameName]?.connected) {
+            this.sockets[gameName] = this.setupSocket(clientSocket, data);
+        }
         return this.sockets[gameName];
     }
 

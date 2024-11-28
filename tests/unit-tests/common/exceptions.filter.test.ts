@@ -1,8 +1,8 @@
 import { ConfigModule } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 
-import { ExceptionsFilter } from "./exceptions.filter";
-import { CustomLogger } from "./logger.service";
+import { ExceptionsFilter } from "../../../src/common/exceptions.filter";
+import { CustomLogger } from "../../../src/common/logger.service";
 
 let filter: ExceptionsFilter;
 let customLogger: CustomLogger;

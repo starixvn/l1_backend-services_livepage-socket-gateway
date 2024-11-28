@@ -32,7 +32,7 @@ export class UserServiceClient {
         const path = "/auth/session/verify";
         const response = await this.instance.post<VerifySessionResponse>(path, request);
 
-        return response.data;
+        return response?.data;
     }
 }
 export default UserServiceClient;

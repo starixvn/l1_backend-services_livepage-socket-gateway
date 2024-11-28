@@ -1,9 +1,11 @@
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test } from "@nestjs/testing";
 
-import { CommonModule } from "../common/common.module";
-import { EventsController } from "./events.controller";
-import { EventsGateway } from "./events.gateway";
+import { CommonModule } from "../../../src/common/common.module";
+import { EventsController } from "../../../src/events/events.controller";
+import { EventsGateway } from "../../../src/events/events.gateway";
+import { ClientConnectionService, PlayConnectionService, ViewConnectionService } from "../../../src/events/connections";
+import configurationTest from "../../../src/config/configuration-test";
 
 describe("EventsController", () => {
     let eventsController: EventsController;
@@ -12,9 +14,9 @@ describe("EventsController", () => {
 
     beforeEach(async () => {
         const moduleRef = await Test.createTestingModule({
-            imports: [ConfigModule, CommonModule],
+            imports: [ConfigModule.forRoot({ isGlobal: true, load: [configurationTest] }), CommonModule],
             controllers: [EventsController],
-            providers: [EventsGateway],
+            providers: [EventsGateway, ClientConnectionService, PlayConnectionService, ViewConnectionService],
         }).compile();
 
         configService = moduleRef.get<ConfigService>(ConfigService);

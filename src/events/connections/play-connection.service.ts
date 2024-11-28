@@ -17,7 +17,7 @@ export class PlayConnectionService extends GameConnectionService {
     }
 
     get receivedEvents(): string[] {
-        return [DataKeys.endBet, DataKeys.status];
+        return [DataKeys.endBet, DataKeys.status, DataKeys.userStakeLevel];
     }
 
     init(clientId: string) {

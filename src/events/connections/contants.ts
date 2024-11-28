@@ -19,6 +19,7 @@ export const DataKeys = {
     um: "um",
     endBet: "endBet",
     status: "status",
+    userStakeLevel: "userStakeLevel",
 };
 
 export const Actions = {

@@ -27,7 +27,7 @@ describe(PlayConnectionService.name, () => {
             const actual = playConnectionService.receivedEvents;
 
             // assert
-            expect(actual).toEqual([DataKeys.endBet, DataKeys.status]);
+            expect(actual).toEqual([DataKeys.endBet, DataKeys.status, DataKeys.userStakeLevel]);
         });
     });
 
@@ -151,7 +151,11 @@ describe(PlayConnectionService.name, () => {
         });
 
         describe("when gameData include key in receivedEvents", () => {
-            const data = [{ [DataKeys.endBet]: 10 }, { [DataKeys.status]: { winAmount: 10 } }];
+            const data = [
+                { [DataKeys.endBet]: 10 },
+                { [DataKeys.status]: { winAmount: 10 } },
+                { [DataKeys.userStakeLevel]: { minBet: 10 } },
+            ];
             let clientSocket;
             beforeEach(() => {
                 clientSocket = { emit: jest.fn() };

@@ -27,4 +27,4 @@ services:
 enabledMsgPack: false
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"
-userServiceUrl: "https://l1-proxy1.lumigame.com/livepageuser/"
+userServiceUrl: "http://user-service:5000"

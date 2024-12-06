@@ -26,5 +26,7 @@ services:
     kenomini: "l2_mini_keno_service"
     kenomini2: "l2_mini_keno_service"
 enabledMsgPack: true
+userServiceUrl: "http://l2_mini_keno_service"
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"
+userServiceUrl: "http://l2_livepage_user_service_awsdr:5000"

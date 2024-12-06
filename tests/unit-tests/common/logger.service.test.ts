@@ -2,7 +2,7 @@ import { ConfigModule } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 import { captureException, captureMessage } from "@sentry/node";
 
-import { CustomLogger } from "./logger.service";
+import { CustomLogger } from "../../../src/common/logger.service";
 
 let logger: CustomLogger;
 jest.mock("@sentry/node");

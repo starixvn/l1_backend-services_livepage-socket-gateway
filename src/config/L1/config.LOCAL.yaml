@@ -3,6 +3,7 @@ env: "LOCAL"
 sentry:
     dsn: "https://6caa1d75e8ab490bbebf159f34a87534@sentry.lumigame.com/33"
     env: "LOCAL"
+
 services:
     sedie: "http://l1-sedie-service-local-service:5000"
     vipsedie: "http://l1-vip-sedie-service-local-service:5000"
@@ -31,4 +32,4 @@ metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"
 serviceUrlPattern: "http://l1-{0}-service-local-service:5000"
 serviceNameSeparator: "-"
-userServiceUrl: "http://l1_livepage_user_service_local:5000"
+userServiceUrl: "http://l1-livepage-user-service-local-service:5000"

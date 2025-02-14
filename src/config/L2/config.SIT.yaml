@@ -7,6 +7,7 @@ sentry:
 services:
     sedie: "http://l2_sedie_service_sit:5000"
     vipsedie: "http://l2_vip_sedie_service_sit:5000"
+    baccarat: "http://l2_baccarat_service_sit:5000"
 enabledMsgPack: true
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"

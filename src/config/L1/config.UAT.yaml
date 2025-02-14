@@ -7,7 +7,7 @@ sentry:
 services:
     sedie: "http://l1-sedie-service-uat-service:5000"
     vipsedie: "http://l1-vip-sedie-service-uat-service:5000"
-    fishprawncrab: "http://l1-fish-prawn-crab-service-uat-service:5000"
+    baccarat: "http://l1_baccarat_service_uat:5000"
     bigsmall: "http://l1-big-small-service-uat-service:5000"
     txturbo: "http://l1-turbo-big-small-service-uat-service:5000"
     dragontiger: "http://l1-dragon-tiger-service-uat-service:5000"

@@ -6,6 +6,7 @@ sentry:
 services:
     sedie: "http://localhost:8082/user/sedie"
     vipsedie: "http://localhost:8081/user/vipsedie"
+    baccarat: "http://localhost:5003/user/baccarat"
 enabledMsgPack: false
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"

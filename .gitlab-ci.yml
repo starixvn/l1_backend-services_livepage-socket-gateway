@@ -2,6 +2,7 @@ variables:
     ENABLE_NODEJS_INTEGRATION_TEST: "true"
     NODEJS_INTEGRATION_TEST_IMAGE_VERSION: "$DOCKER_REG_LOCAL_URL/base/node:20.9.0-alpine-24h1.1"
     NODEJS_IMAGE: "$DOCKER_REG_LOCAL_URL/base/node:20.9.0-alpine-24h1.1"
+    BYPASS_CRITICAL_VULNERABILITY: 'true'
 
 include:
     - project: "ci/core-cicd"

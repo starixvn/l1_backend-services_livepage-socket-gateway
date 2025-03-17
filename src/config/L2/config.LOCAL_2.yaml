@@ -7,6 +7,8 @@ sentry:
 services:
     sedie: "http://l2-sedie-service-local2-service:5000"
     vipsedie: "http://l2-vip-sedie-service-local2-service:5000"
+    baccarat: "http://l2-baccarat-service-local2-service:5000"
+    unbalancedbigsmall4: "http://l2-unbalanced-bigsmall-service-local2-service:5000"
 enabledMsgPack: false
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"

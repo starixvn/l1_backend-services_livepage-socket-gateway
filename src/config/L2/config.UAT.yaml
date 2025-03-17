@@ -5,11 +5,13 @@ sentry:
     env: "UAT"
 
 services:
-    sedie: "http://l2_sedie_service_uat:5000"
-    vipsedie: "http://l2_vip_sedie_service_uat:5000"
+    sedie: "http://l2-sedie-service-uat-service:5000"
+    vipsedie: "http://l2-vip-sedie-service-uat-service:5000"
+    baccarat: "http://l2-baccarat-service-uat-service:5000"
+    unbalancedbigsmall4: "http://l2-unbalanced-bigsmall-service-uat-service:5000"
 enabledMsgPack: true
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"
-serviceUrlPattern: "http://l2_{0}_service_uat:5000"
-serviceNameSeparator: "_"
-userServiceUrl: "http://l2_livepage_user_service_uat:5000"
+serviceUrlPattern: "http://l2-{0}-service-uat-service:5000"
+serviceNameSeparator: "-"
+userServiceUrl: "http://l2-livepage-user-service-uat-service:5000"

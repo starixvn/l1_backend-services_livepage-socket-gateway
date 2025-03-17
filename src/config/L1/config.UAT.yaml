@@ -7,8 +7,8 @@ sentry:
 services:
     sedie: "http://l1-sedie-service-uat-service:5000"
     vipsedie: "http://l1-vip-sedie-service-uat-service:5000"
-    baccarat: "http://l1-baccarat-service-uat-service:5000"
     unbalancedbigsmall4: "http://l1-unbalanced-bigsmall-service-uat-service:5000"
+    baccarat: "http://l1-baccarat-service-uat-service:5000"
 enabledMsgPack: true
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"

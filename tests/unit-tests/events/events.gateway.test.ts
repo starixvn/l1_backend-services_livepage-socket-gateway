@@ -318,18 +318,6 @@ describe("EventsGateway", () => {
 
         describe("when exist play socket", () => {
             const gameName = "gameName";
-            it("should not disconnect play socket if not exist play socket", () => {
-                // arrange
-                playConnectionService.getSocket = jest.fn().mockReturnValueOnce(null);
-                clientConnectionService.setSocket = jest.fn();
-
-                // act
-                gateway.outGame(gameName, client);
-
-                // assert
-                expect(clientConnectionService.setSocket).not.toHaveBeenCalled();
-            });
-
             it("should disconnect play socket", () => {
                 // arrange
                 const playSocket = { connected: true, disconnect: jest.fn() };

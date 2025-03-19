@@ -127,8 +127,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
         if (socket?.connected) {
             socket.disconnect();
-            this.clientConnectionService.setSocket(clientId, gameName, null);
             this.playConnectionService.setSocket(clientId, gameName, null);
         }
+
+        this.clientConnectionService.setSocket(clientId, gameName, null);
     }
 }

@@ -1,0 +1,17 @@
+---
+env: "prod"
+sentry:
+    dsn: "http://cbfe873869b94ef3b69bc2ab764c30da@sentry-scklprod-ovs.ops-klprod.gamora.prod/160"
+    env: "prod"
+
+services:
+    sedie: "http://l2-sedie-service-klprod-service:5000"
+    vipsedie: "http://l2-vip-sedie-service-klprod-service:5000"
+    baccarat: "http://l2-baccarat-service-klprod-service:5000"
+    unbalancedbigsmall4: "http://l2-unbalanced-bigsmall-service-klprod-service:5000"
+enabledMsgPack: true
+metrics:
+    secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"
+serviceUrlPattern: "http://l2_{0}_service_prod:5000"
+serviceNameSeparator: "_"
+userServiceUrl: "http://l2-livepage-user-service-klprod-service:5000"

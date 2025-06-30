@@ -12,6 +12,6 @@ services:
 enabledMsgPack: true
 metrics:
     secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"
-serviceUrlPattern: "http://l1_{0}_service_prod:5000"
-serviceNameSeparator: "_"
+serviceUrlPattern: "http://l1-{0}-service-klprod-service:5000"
+serviceNameSeparator: "-"
 userServiceUrl: "http://l1-livepage-user-service-klprod-service:5000"

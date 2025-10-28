@@ -1,0 +1,17 @@
+---
+env: "SIT_1"
+sentry:
+    dsn: "http://ca6484ba1e52449b88ef820e7fe2325d@10.2.190.51:9009/271"
+    env: "SIT_1"
+
+services:
+    sedie: "http://l2-sedie-service-sit1-service:5000"
+    vipsedie: "http://l2-vip-sedie-service-sit1-service:5000"
+    unbalancedbigsmall4: "http://l2-unbalanced-bigsmall-service-sit1-service:5000"
+    baccarat: "http://l2-baccarat-service-sit1-service:5000"
+enabledMsgPack: true
+metrics:
+    secretKey: "6c1f0f28-70f2-46ae-b031-22624a6cd8df"
+serviceUrlPattern: "http://l2-{0}-service-sit1-service:5000"
+serviceNameSeparator: "-"
+userServiceUrl: "http://l2-livepage-user-service-sit1-service:5000"
